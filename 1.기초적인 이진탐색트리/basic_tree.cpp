@@ -67,9 +67,12 @@ public:
 	}
 
 	int remove(int target_key) {
-		
-	}
+		if (head != NULL) {
+			cout << "cannot remove! tree is emptied!" << endl;
+			return -1;
+		}
 
+	}
 };
 int main() {
 	tree& test_tree = *(new tree());
