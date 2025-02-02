@@ -5,25 +5,26 @@ class node {
 	friend class tree;
 	int key;
 	int data;
+	tree* lchild;
+	tree* rchild;
+
+
 public :
 	node(int key, int data) {
 		cout << "node is made!" << endl;
 		this->key = key;
 		this->data = data;
+		this->lchild = NULL;
+		this->rchild = NULL;
 	}
 };
 
 class tree {
 	node* head;
-	tree* lchild;
-	tree* rchild;
 
 public:
 	tree() {
 		cout << "tree is made!" << endl;
-		head = NULL;
-		lchild = NULL;
-		rchild = NULL;
 	}
 
 	~tree() {
@@ -31,12 +32,18 @@ public:
 	}
 
 	int search(int target_key) {
-		if (head != NULL) {
-			if (head->key == target_key) return head->data;
-			else {
-				if (lchild != NULL) search(lchild->search(target_key));
-				if (rchild != NULL) search(rchild->search(target_key));
-			}
+		if (head == NULL) {
+			cout << "can not search. there is no such key." << endl;
+		}
+
+		if (target_key < head->key) {
+			if (head->lchild != NULL) return head->lchild->search(target_key);
+		} 
+		else if (head->key < target_key) {
+			if (head->rchild != NULL) return head->rchild->search(target_key);
+		}
+		else {
+			return head->data;
 		}
 	}
 
@@ -46,10 +53,12 @@ public:
 		}
 		else {
 			if (new_key < head->key) {
-				lchild->insert(new_key, new_data);
+				head->lchild = new tree();
+				head->lchild->insert(new_key, new_data);
 			}
 			else if(head->key < new_key) {
-				rchild->insert(new_key, new_data);
+				head->rchild = new tree();
+				head->rchild->insert(new_key, new_data);
 			}
 			else {
 				cout << "cannot insert! key is same!" << endl;
@@ -58,12 +67,17 @@ public:
 	}
 
 	int remove(int target_key) {
-
+		
 	}
+
 };
 int main() {
 	tree& test_tree = *(new tree());
 	test_tree.insert(5, 1515);
+	test_tree.insert(7, 2727);
+	test_tree.insert(3, 1313);
 	cout << "searched data is " << test_tree.search(5) << endl;
+	cout << "searched data is " << test_tree.search(7) << endl;
+	cout << "searched data is " << test_tree.search(3) << endl;
 	return 0;
 }
