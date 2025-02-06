@@ -25,9 +25,9 @@ public:
 
 	~tree();
 
-	void traverse();
+	void traverse_print();
 
-	void traverse_remove();
+	void remove_all();
 
 	int search(int target_key);
 

@@ -19,23 +19,23 @@ tree::tree() {
 }
 
 tree::~tree() {
-	traverse_remove();
+	remove_all();
 }
 
-void tree::traverse() {
+void tree::traverse_print() {
 	if (head == NULL) {
 		cout << "cannot traverse. head is NULL." << endl;
 		return;
 	}
 	cout << "node key : " << head->key << " / node data : " << head->data << endl;
-	if (head->lchild != NULL) head->lchild->traverse();
-	if (head->rchild != NULL) head->rchild->traverse();
+	if (head->lchild != NULL) head->lchild->traverse_print();
+	if (head->rchild != NULL) head->rchild->traverse_print();
 }
 
-void tree::traverse_remove() {
+void tree::remove_all() {
 	if (head != NULL) {
-		if (head->lchild != NULL) head->lchild->traverse_remove();
-		if (head->rchild != NULL) head->rchild->traverse_remove();
+		if (head->lchild != NULL) head->lchild->remove_all();
+		if (head->rchild != NULL) head->rchild->remove_all();
 		delete head;
 		head = NULL;
 	}
