@@ -27,11 +27,11 @@ public:
 
 	void traverse_print();
 
-	void remove_all();
-
 	int search(int target_key);
 
 	void insert(int new_key, int new_data);
+
+	void remove_all();
 
 	void remove(int target_key);
 

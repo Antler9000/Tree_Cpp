@@ -32,25 +32,19 @@ void tree::traverse_print() {
 	if (head->rchild != NULL) head->rchild->traverse_print();
 }
 
-void tree::remove_all() {
-	if (head != NULL) {
-		if (head->lchild != NULL) head->lchild->remove_all();
-		if (head->rchild != NULL) head->rchild->remove_all();
-		delete head;
-		head = NULL;
-	}
-}
-
 int tree::search(int target_key) {
 	if (head == NULL) {
 		cout << "can not search. there is no such key." << endl;
+		return;
 	}
 
 	if (target_key < head->key) {
 		if (head->lchild != NULL) return head->lchild->search(target_key);
+		else  cout << "there is no such key in searching." << endl;
 	} 
 	else if (head->key < target_key) {
 		if (head->rchild != NULL) return head->rchild->search(target_key);
+		else  cout << "there is no such key in searching." << endl;
 	}
 	else {
 		return head->data;
@@ -72,7 +66,17 @@ void tree::insert(int new_key, int new_data) {
 		}
 		else {
 			cout << "cannot insert! key is same!" << endl;
+			return;
 		}
+	}
+}
+
+void tree::remove_all() {
+	if (head != NULL) {
+		if (head->lchild != NULL) head->lchild->remove_all();
+		if (head->rchild != NULL) head->rchild->remove_all();
+		delete head;
+		head = NULL;
 	}
 }
 
