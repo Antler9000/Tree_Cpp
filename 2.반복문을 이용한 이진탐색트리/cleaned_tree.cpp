@@ -133,15 +133,90 @@ public:
 	}
 
 	void remove(int target_key) {
+		if (head == NULL) {
+			cout << " cannot remove node. there is no node!" << endl;
+			return;
+		}
 
+		if (head->key == target_key) {
+			remove_target(head);
+		}
+		else {
+			node* search_ptr = head;
+			while (true) {
+				if (target_key < search_ptr->key) {
+					if (search_ptr->lchild != NULL) {
+						if (search_ptr->lchild->key == target_key) {
+							remove_target(search_ptr->lchild);
+						}
+						else search_ptr = search_ptr->lchild;
+					}
+					else {
+						cout << "cannot remove node. there is no such node!" << endl;
+						return;
+					}
+				}
+				else if (search_ptr->key < target_key) {
+					if (search_ptr->rchild != NULL) {
+						if (search_ptr->rchild->key == target_key) {
+							remove_target(search_ptr->rchild);
+						}
+						else search_ptr = search_ptr->rchild;
+					}
+					else {
+						cout << "cannot remove node. there is no such node!" << endl;
+						return;
+					}
+				}
+				else {
+					cout << "should not reach here while removing. key matching should be detected in other 'if'." << endl;
+				}
+			}
+		}
 	}
 
-	void replace_with_inorder_predecessor() {
-
+	void replace_with_inorder_predecessor(node*& target_ptr) {
+		node* previous_ptr = NULL;
+		node* traverse_ptr = target_ptr->lchild;
+		while (traverse_ptr->rchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->rchild;
+		}
+		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;				//삭제대상의 자리를 매꾸러갈 중위선행자가 가지고 있을 수 있는 왼쪽 자식을 중위선행자의 부모에게 맡겨야함
+		else target_ptr->lchild = traverse_ptr->lchild;									//근데 삭제대상의 왼쪽자식이 바로 중위선행자인 경우에는 중위선행자에게 맡기는 것은 같으나 오른쪽 자식이 아닌 왼쪽 자식으로 맡겨야함.
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
 	}
 
-	void replace_with_inorder_successor() {
+	void replace_with_inorder_successor(node*& target_ptr) {
+		node* previous_ptr = NULL;
+		node* traverse_ptr = target_ptr->rchild;
+		while (traverse_ptr->lchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->lchild;
+		}
+		if (previous_ptr != NULL) previous_ptr->lchild = traverse_ptr->rchild;
+		else target_ptr->rchild = traverse_ptr->rchild;
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
+	}
 
+	void remove_target(node*& target_ptr) {
+		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {						//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+			replace_with_inorder_successor(target_ptr);
+		}
+		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
+			replace_with_inorder_successor(target_ptr);
+		}
+		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
+			replace_with_inorder_predecessor(target_ptr);
+		}
+		else {
+			delete target_ptr;
+			target_ptr = NULL;
+		}
 	}
 };
 
@@ -156,6 +231,25 @@ int main() {
 	cout << "traverse" << endl;
 	test_tree.traverse_print();
 
+	test_tree.remove(7);
+	cout << "traverse" << endl;
+	test_tree.traverse_print();
+
+	test_tree.remove(3);
+	cout << "traverse" << endl;
+	test_tree.traverse_print();
+
+	test_tree.remove(5);
+	cout << "traverse" << endl;
+	test_tree.traverse_print();
+
+	test_tree.remove(4);
+	cout << "traverse" << endl;
+	test_tree.traverse_print();
+
+	test_tree.remove(6);
+	cout << "traverse" << endl;
+	test_tree.traverse_print();
 
 	return 0;
 }

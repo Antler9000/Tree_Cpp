@@ -16,6 +16,7 @@ node::node(int key, int data) {
 
 tree::tree() {
 	cout << "tree is made!" << endl;
+	head = NULL;
 }
 
 tree::~tree() {
@@ -35,7 +36,7 @@ void tree::traverse_print() {
 int tree::search(int target_key) {
 	if (head == NULL) {
 		cout << "can not search. there is no such key." << endl;
-		return;
+		return -1;
 	}
 
 	if (target_key < head->key) {
@@ -106,7 +107,7 @@ void tree::remove(int target_key) {
 		}
 	}
 	else {
-		if (head->lchild != NULL && head->rchild != NULL) {			//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+		if (head->lchild != NULL && head->rchild != NULL) {								//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 			replace_with_inorder_successor();
 		}
 		else if (head->lchild == NULL && head->rchild != NULL) {
