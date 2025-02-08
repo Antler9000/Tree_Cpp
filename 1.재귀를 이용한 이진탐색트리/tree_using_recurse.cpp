@@ -23,15 +23,37 @@ tree::~tree() {
 	remove_all();
 }
 
-void tree::traverse_print() {
+void tree::preorder_traverse_print() {
 	if (head == NULL) {
 		cout << "cannot traverse. head is NULL." << endl;
 		return;
 	}
 	cout << "node key : " << head->key << " / node data : " << head->data << endl;
-	if (head->lchild != NULL) head->lchild->traverse_print();
-	if (head->rchild != NULL) head->rchild->traverse_print();
+	if (head->lchild != NULL) head->lchild->preorder_traverse_print();
+	if (head->rchild != NULL) head->rchild->preorder_traverse_print();
 }
+
+void tree::inorder_traverse_print() {
+	if (head == NULL) {
+		cout << "cannot traverse. head is NULL." << endl;
+		return;
+	}
+	if (head->lchild != NULL) head->lchild->inorder_traverse_print();
+	cout << "node key : " << head->key << " / node data : " << head->data << endl;
+	if (head->rchild != NULL) head->rchild->inorder_traverse_print();
+}
+
+
+void tree::postorder_traverse_print() {
+	if (head == NULL) {
+		cout << "cannot traverse. head is NULL." << endl;
+		return;
+	}
+	if (head->lchild != NULL) head->lchild->postorder_traverse_print();
+	if (head->rchild != NULL) head->rchild->postorder_traverse_print();
+	cout << "node key : " << head->key << " / node data : " << head->data << endl;
+}
+
 
 int tree::search(int target_key) {
 	if (head == NULL) {

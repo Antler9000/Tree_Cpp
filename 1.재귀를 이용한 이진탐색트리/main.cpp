@@ -8,31 +8,31 @@ int main() {
 	test_tree.insert(4, 2424);
 	test_tree.insert(6, 3636);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove(7);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove(5);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove(6);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove(4);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove(3);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	test_tree.remove_all();
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.preorder_traverse_print();
 
 	return 0;
 }

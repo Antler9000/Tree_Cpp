@@ -1,5 +1,5 @@
-#ifndef MESSY_TREE_H
-#define MESSY_TREE_H
+#ifndef TREE_USING_RECURSE_H
+#define TREE_USING_RECURSE_H
 
 
 #include <iostream>
@@ -25,7 +25,11 @@ public:
 
 	~tree();
 
-	void traverse_print();
+	void preorder_traverse_print();
+
+	void inorder_traverse_print();
+
+	void postorder_traverse_print();
 
 	int search(int target_key);
 
@@ -41,4 +45,4 @@ public:
 };
 
 
-#endif //MESSY_TREE_H
+#endif //TREE_USING_RECURSE_H

@@ -49,6 +49,15 @@ public:
 
 		return head_data[--item_num];
 	}
+
+	node* get_top() {
+		if (item_num <= 0) {
+			cout << "cannot get top from stack. it is emptied!" << endl;
+			return NULL;
+		}
+
+		return head_data[item_num-1];
+	}
 };
 
 class tree {
@@ -57,18 +66,14 @@ class tree {
 public:
 	tree() {
 		cout << "tree is made!" << endl;
+		head = NULL;
 	}
 
 	~tree() {
-
+		remove_all();
 	}
 
-	void traverse_print() {
-		if (head == NULL) {
-			cout << "cannot traverse.head is NULL." << endl;
-			return;
-		}
-
+	void preorder_traverse_print() {
 		stack head_stack;
 		node* traverse_ptr = NULL;
 		head_stack.push(this->head);
@@ -76,6 +81,68 @@ public:
 			cout << "node key : " << traverse_ptr->key << " / node data : " << traverse_ptr->data << endl;
 			if(traverse_ptr->rchild != NULL) head_stack.push(traverse_ptr->rchild);
 			if(traverse_ptr->lchild != NULL) head_stack.push(traverse_ptr->lchild);
+		}
+	}
+
+	void inorder_traverse_print() {
+		stack head_stack;
+		node* traverse_ptr = NULL;
+		bool is_popped = false;
+		head_stack.push(this->head);
+		while (traverse_ptr = head_stack.get_top()) {
+			if (traverse_ptr->lchild != NULL && is_popped == false) {
+				head_stack.push(traverse_ptr->lchild);
+				is_popped = false;
+			}
+			else if (traverse_ptr->rchild != NULL) {
+				cout << "node key : " << traverse_ptr->key << " / node data : " << traverse_ptr->data << endl;
+				head_stack.push(traverse_ptr->rchild);
+				is_popped = false;
+			}
+			else {
+				cout << "node key : " << traverse_ptr->key << " / node data : " << traverse_ptr->data << endl;
+				int key_whoese_popped_from = head_stack.pop()->key;
+				traverse_ptr = head_stack.pop();
+				if (traverse_ptr == NULL) break;
+				while (!(traverse_ptr->lchild != NULL && traverse_ptr->lchild->key == key_whoese_popped_from)) {
+					key_whoese_popped_from = traverse_ptr->key;
+					traverse_ptr = head_stack.pop();
+					if (traverse_ptr == NULL) break;
+				}	//"오른쪽 자식이 없는 막다른 노드 -> 중위순회상 다음 조상 노드"로 이동한것임
+				is_popped = true;
+				head_stack.push(traverse_ptr);
+			}
+		}
+	}
+
+	void postorder_traverse_print() {
+		stack head_stack;
+		node* traverse_ptr = NULL;
+		bool is_popped = false;
+		head_stack.push(this->head);
+		while (traverse_ptr = head_stack.get_top()) {
+			if (traverse_ptr->lchild != NULL && is_popped == false) {
+				head_stack.push(traverse_ptr->lchild);
+				is_popped = false;
+			}
+			else if (traverse_ptr->rchild != NULL) {
+				head_stack.push(traverse_ptr->rchild);
+				is_popped = false;
+			}
+			else {
+				cout << "node key : " << traverse_ptr->key << " / node data : " << traverse_ptr->data << endl;
+				int key_whoese_popped_from = head_stack.pop()->key;
+				traverse_ptr = head_stack.pop();
+				if (traverse_ptr == NULL) break;
+				while (!(traverse_ptr->lchild != NULL && traverse_ptr->lchild->key == key_whoese_popped_from)) {
+					cout << "node key : " << traverse_ptr->key << " / node data : " << traverse_ptr->data << endl;
+					key_whoese_popped_from = traverse_ptr->key;
+					traverse_ptr = head_stack.pop();
+					if (traverse_ptr == NULL) break;
+				}	//"오른쪽 자식이 없는 막다른 노드 -> 중위순회상 다음 조상 노드"로 이동한것임
+				is_popped = true;
+				head_stack.push(traverse_ptr);
+			}
 		}
 	}
 
@@ -129,7 +196,7 @@ public:
 	}
 
 	void remove_all() {
-
+		
 	}
 
 	void remove(int target_key) {
@@ -148,6 +215,7 @@ public:
 					if (search_ptr->lchild != NULL) {
 						if (search_ptr->lchild->key == target_key) {
 							remove_target(search_ptr->lchild);
+							return;
 						}
 						else search_ptr = search_ptr->lchild;
 					}
@@ -160,6 +228,7 @@ public:
 					if (search_ptr->rchild != NULL) {
 						if (search_ptr->rchild->key == target_key) {
 							remove_target(search_ptr->rchild);
+							return;
 						}
 						else search_ptr = search_ptr->rchild;
 					}
@@ -229,27 +298,27 @@ int main() {
 	test_tree.insert(4, 2424);
 	test_tree.insert(6, 3636);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(7);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(3);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(5);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(4);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(6);
 	cout << "traverse" << endl;
-	test_tree.traverse_print();
+	test_tree.postorder_traverse_print();
 
 	return 0;
 }
