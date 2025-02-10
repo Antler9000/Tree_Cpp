@@ -83,9 +83,12 @@ public:
 		cout << "node key : " << node_ptr->key << " / node data : " << node_ptr->data << endl;
 	}
 
-
 	void preorder_traverse_print() {
 		cout << "preorder_traverse" << endl;
+		if (head == NULL) {
+			cout << "can not traverse. there is no node." << endl;
+			return;
+		}
 		stack head_stack;
 		node* traverse_ptr = NULL;
 		head_stack.push(this->head);
@@ -99,58 +102,60 @@ public:
 
 	void inorder_traverse_print() {
 		cout << "inorder_traverse" << endl;
+		if (head == NULL) {
+			cout << "can not traverse. there is no node." << endl;
+			return;
+		}
 		stack head_stack;
 		node* traverse_ptr = NULL;
 		head_stack.push(head);
+		bool new_left_spine = true;
 		while (!head_stack.is_empty()) {
-			while (head_stack.get_top() != NULL && head_stack.get_top()->lchild) {
-				traverse_ptr = head_stack.get_top()->lchild;
-				head_stack.push(traverse_ptr);
+			while (new_left_spine && head_stack.get_top()->lchild) {
+				head_stack.push(head_stack.get_top()->lchild);
 			}
 			traverse_ptr = head_stack.pop();
-			if (traverse_ptr) print_node(traverse_ptr);
-			traverse_ptr = head_stack.pop();
-			if (traverse_ptr) {
-				print_node(traverse_ptr);
+			print_node(traverse_ptr);
+			if (traverse_ptr->rchild) {
+				new_left_spine = true;
 				head_stack.push(traverse_ptr->rchild);
 			}
+			else new_left_spine = false;
 		}
 		cout << endl;
 	}
 
 	void postorder_traverse_print() {
 		cout << "postorder_traverse" << endl;
+		if (head == NULL) {
+			cout << "can not traverse. there is no node." << endl;
+			return;
+		}
 		stack head_stack;
 		node* traverse_ptr = NULL;
-		bool is_popped = false;
-		head_stack.push(this->head);
-		while (traverse_ptr = head_stack.get_top()) {
-			if (traverse_ptr->lchild != NULL && is_popped == false) {
-				head_stack.push(traverse_ptr->lchild);
-				is_popped = false;
+		head_stack.push(head);
+		bool new_left_spine = true;
+		bool new_right_spine = true;
+		while (!head_stack.is_empty()) {
+			while (new_left_spine && head_stack.get_top()->lchild) {
+				head_stack.push(head_stack.get_top()->lchild);
 			}
-			else if (traverse_ptr->rchild != NULL) {
+			traverse_ptr = head_stack.get_top();
+			if (new_right_spine && traverse_ptr->rchild) {
+				new_left_spine = true;
 				head_stack.push(traverse_ptr->rchild);
-				is_popped = false;
 			}
 			else {
 				print_node(traverse_ptr);
-				int key_whoese_popped_from = head_stack.pop()->key;
-				traverse_ptr = head_stack.pop();
-				if (traverse_ptr == NULL) break;
-				while (!(traverse_ptr->lchild != NULL && traverse_ptr->lchild->key == key_whoese_popped_from)) {
-					print_node(traverse_ptr);
-					key_whoese_popped_from = traverse_ptr->key;
-					traverse_ptr = head_stack.pop();
-					if (traverse_ptr == NULL) break;
-				}	//"오른쪽 자식이 없는 막다른 노드 -> 중위순회상 다음 조상 노드"로 이동한것임
-				is_popped = true;
-				head_stack.push(traverse_ptr);
+				new_left_spine = false;
+				node* previous_node = head_stack.pop();
+				node* present_node = head_stack.get_top();
+				if (present_node && present_node->rchild && present_node->rchild == previous_node) new_right_spine = false;
+				else new_right_spine = true;
 			}
 		}
 		cout << endl;
 	}
-
 
 	int search(int target_key) {
 		if (head == NULL) {
@@ -339,28 +344,28 @@ int main() {
 	test_tree.insert(6, 3636);
 	test_tree.insert(1, 5151);
 	test_tree.insert(8, 5858);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(7);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(3);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(5);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(4);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(6);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(1);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	test_tree.remove(8);
-	test_tree.inorder_traverse_print();
+	test_tree.postorder_traverse_print();
 
 	delete &test_tree;
 	return 0;
