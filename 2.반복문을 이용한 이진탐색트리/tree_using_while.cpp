@@ -8,7 +8,6 @@ class node {
 	node* lchild;
 	node* rchild;
 
-
 public:
 	node(int key, int data) {
 		this->key = key;
@@ -16,10 +15,26 @@ public:
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
+
+	inline node* get_node() {
+		return this;
+	}
+
+	inline void set_key(int key) {
+		this->key = key;
+	}
+
+	inline void set_data(int data) {
+		this->data = data;
+	}
+
+	//부모의 특정 자식포인터 변수(lchild or rchild)를 parent_seat이라는 이름의 레퍼런스 인자로 받아와서 더미 자식을 할당해주는 메소드
+	static inline node* set_dummy_child(node*& parent_seat) {
+		return parent_seat = new node(0, 0);
+	}
 };
 
 //일단 스택이 가지는 아이템의 타입은 node*이고, 최대 개수는 100개라고 가정하고 어레이 구현을 사용함.
-//아이템 개수에 상관없이 적절한 메모리 크기를 사용하도록, 추후에 연결된 노드 구조로 개선할 예정
 class stack {
 	node* head_data[100];
 	int item_num;
@@ -68,23 +83,46 @@ public:
 class tree {
 	node* head;
 
-public:
-	tree() {
-		head = NULL;
-		cout << "tree is made!" << endl;
-	}
-
-	~tree() {
-		remove_all();
-		cout << "tree is removed!" << endl;
-	}
-
 	inline void print_node(node* node_ptr) {
 		cout << "node key : " << node_ptr->key << " / node data : " << node_ptr->data << endl;
 	}
 
-	void preorder_traverse_print() {
-		cout << "preorder_traverse" << endl;
+	inline void remove_childs(node* node_ptr) {
+		if (node_ptr->lchild) {
+			delete node_ptr->lchild;
+			node_ptr->lchild = NULL;
+		}
+		if (node_ptr->rchild) {
+			delete node_ptr->rchild;
+			node_ptr->rchild = NULL;
+		}
+	}
+	
+	//"to_do_with_target_node" 함수 포인터는 특정 target_key를 가진 트리상 노드에 수행할 작업을 위한 인터페이스임
+	//"to_do_with_target_hole" 함수 포인터는 특정 target_key가 새로 삽입되기에 적합한 위치(자식 포인터 변수)에 수행할 작업을 위한 인터페이스임
+	//"to_do_with_target_hole" 함수 포인터는 부모의 자식 포인터 변수를 수정해야하므로 레퍼런스 인자를 가짐
+	node* search(int target_key, node* (node::* to_do_with_target_node)(), node* (* to_do_with_target_hole)(node*&)) {
+		if (head == NULL) return (*to_do_with_target_hole)(head);
+
+
+		node* search_ptr = head;
+		while (true) {
+			if (target_key < search_ptr->key) {
+				if (search_ptr->lchild != NULL) search_ptr = search_ptr->lchild;
+				else return (*to_do_with_target_hole)(search_ptr->lchild);
+			}
+			else if (search_ptr->key < target_key) {
+				if (search_ptr->rchild != NULL) search_ptr = search_ptr->rchild;
+				else return (*to_do_with_target_hole)(search_ptr->rchild);
+			}
+			else {
+				return (search_ptr->*to_do_with_target_node)();
+			}
+		}
+	}
+
+	//"to_do' 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
+	void preorder_traverse(void (tree::* to_do)(node*)) {
 		if (head == NULL) {
 			cout << "can not traverse. there is no node." << endl;
 			return;
@@ -93,15 +131,14 @@ public:
 		node* traverse_ptr = NULL;
 		head_stack.push(this->head);
 		while ((traverse_ptr = head_stack.pop())) {
-			print_node(traverse_ptr);
+			(this->*to_do)(traverse_ptr);
 			if(traverse_ptr->rchild != NULL) head_stack.push(traverse_ptr->rchild);
 			if(traverse_ptr->lchild != NULL) head_stack.push(traverse_ptr->lchild);
 		}
-		cout << endl;
 	}
 
-	void inorder_traverse_print() {
-		cout << "inorder_traverse" << endl;
+	//"to_do' 함수 포인터는 중위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
+	void inorder_traverse(void (tree::* to_do)(node*)) {
 		if (head == NULL) {
 			cout << "can not traverse. there is no node." << endl;
 			return;
@@ -115,18 +152,17 @@ public:
 				head_stack.push(head_stack.get_top()->lchild);
 			}
 			traverse_ptr = head_stack.pop();
-			print_node(traverse_ptr);
+			(this->*to_do)(traverse_ptr);
 			if (traverse_ptr->rchild) {
 				new_left_spine = true;
 				head_stack.push(traverse_ptr->rchild);
 			}
 			else new_left_spine = false;
 		}
-		cout << endl;
 	}
 
-	void postorder_traverse_print() {
-		cout << "postorder_traverse" << endl;
+	//"to_do' 함수 포인터는 후위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
+	void postorder_traverse(void (tree::*to_do)(node*)) {
 		if (head == NULL) {
 			cout << "can not traverse. there is no node." << endl;
 			return;
@@ -146,7 +182,7 @@ public:
 				head_stack.push(traverse_ptr->rchild);
 			}
 			else {
-				print_node(traverse_ptr);
+				(this->*to_do)(traverse_ptr);
 				new_left_spine = false;
 				node* previous_node = head_stack.pop();
 				node* present_node = head_stack.get_top();
@@ -154,94 +190,55 @@ public:
 				else new_right_spine = true;
 			}
 		}
+	}
+
+
+public:
+	tree() {
+		cout << "tree is being made!" << endl;
+		head = NULL;
+	}
+
+	~tree() {
+		cout << "tree is being removed" << endl;
+		remove_all();
+	}
+
+	void preorder_print() {
+		cout << "preorder_traverse" << endl;
+		preorder_traverse(&tree::print_node);
 		cout << endl;
 	}
 
-	int search(int target_key) {
-		if (head == NULL) {
-			cout << "can not search. there is no such key." << endl;
-			return -1;
-		}
-
-		node* search_ptr = head;
-		while (search_ptr->key != target_key) {
-			if (target_key < search_ptr->key) {
-				if (search_ptr->lchild != NULL) search_ptr = search_ptr->lchild;
-				else  cout << "there is no such key in searching." << endl;
-			}
-			else if (search_ptr->key < target_key) {
-				if (search_ptr->rchild != NULL) search_ptr = search_ptr->rchild;
-				else  cout << "there is no such key in searching." << endl;
-			}
-			else {
-				return search_ptr->data;
-			}
-		}
+	void inorder_print() {
+		cout << "inorder_traverse" << endl;
+		inorder_traverse(&tree::print_node);
+		cout << endl;
 	}
 
-
-	void insert(int new_key, int new_data) {
-		if (head == NULL) {
-			head = new node(new_key, new_data);
-		}
-		else {
-			node* search_ptr = head;
-			while (true) {
-				if (new_key < search_ptr->key) {
-					if (search_ptr->lchild != NULL) search_ptr = search_ptr->lchild;
-					else {
-						search_ptr->lchild = new node(new_key, new_data);
-						return;
-					}
-				}
-				else if (search_ptr->key < new_key) {
-					if (search_ptr->rchild != NULL) search_ptr = search_ptr->rchild;
-					else {
-						search_ptr->rchild = new node(new_key, new_data);
-						return;
-					}
-				}
-			}
-		}
+	void postorder_print() {
+		cout << "postorder_traverse" << endl;
+		postorder_traverse(&tree::print_node);
+		cout << endl;
 	}
 
 	void remove_all() {
-		stack head_stack;
-		node* traverse_ptr = NULL;
-		bool is_popped = false;
-		head_stack.push(this->head);
-		while (traverse_ptr = head_stack.get_top()) {
-			if (traverse_ptr->lchild != NULL && is_popped == false) {
-				head_stack.push(traverse_ptr->lchild);
-				is_popped = false;
-			}
-			else if (traverse_ptr->rchild != NULL) {
-				head_stack.push(traverse_ptr->rchild);
-				is_popped = false;
-			}
-			else {
-				delete traverse_ptr->lchild;
-				delete traverse_ptr->rchild;
-				traverse_ptr->lchild = NULL;
-				traverse_ptr->rchild = NULL;
-				int key_whoese_popped_from = head_stack.pop()->key;
-				traverse_ptr = head_stack.pop();
-				if (traverse_ptr == NULL) break;
-				while (!(traverse_ptr->lchild != NULL && traverse_ptr->lchild->key == key_whoese_popped_from)) {
-					delete traverse_ptr->lchild;
-					delete traverse_ptr->rchild;
-					traverse_ptr->lchild = NULL;
-					traverse_ptr->rchild = NULL;
-					key_whoese_popped_from = traverse_ptr->key;
-					traverse_ptr = head_stack.pop();
-					if (traverse_ptr == NULL) break;
-				}	//"오른쪽 자식이 없는 막다른 노드 -> 중위순회상 다음 조상 노드"로 이동한것임
-				is_popped = true;
-				head_stack.push(traverse_ptr);
-			}
-		}
+		cout << "remove all" << endl;
+		postorder_traverse(&tree::remove_childs);
 		delete head;
 		head = NULL;
+	}
+
+	int get_data(int target_key) {
+		node* target_node = search(target_key, &node::get_node, NULL);
+		return target_node->data;
+	}
+
+	node* insert(int new_key, int new_data) {
+		node* made_child = search(new_key, NULL, &node::set_dummy_child);
+		made_child->set_key(new_key);
+		made_child->set_data(new_data);
+		return made_child;
 	}
 
 	void remove(int target_key) {
@@ -296,8 +293,8 @@ public:
 			previous_ptr = traverse_ptr;
 			traverse_ptr = traverse_ptr->rchild;
 		}
-		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;				//삭제대상의 자리를 매꾸러갈 중위선행자가 가지고 있을 수 있는 왼쪽 자식을 중위선행자의 부모에게 맡겨야함
-		else target_ptr->lchild = traverse_ptr->lchild;									//근데 삭제대상의 왼쪽자식이 바로 중위선행자인 경우에는 중위선행자에게 맡기는 것은 같으나 오른쪽 자식이 아닌 왼쪽 자식으로 맡겨야함.
+		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;			//삭제대상의 자리를 매꾸러갈 중위선행자가 가지고 있을 수 있는 왼쪽 자식을 중위선행자의 부모에게 맡겨야함
+		else target_ptr->lchild = traverse_ptr->lchild;								//근데 삭제대상의 왼쪽자식이 바로 중위선행자인 경우에는 중위선행자에게 맡기는 것은 같으나 오른쪽 자식이 아닌 왼쪽 자식으로 맡겨야함.
 		target_ptr->key = traverse_ptr->key;
 		target_ptr->data = traverse_ptr->data;
 		delete traverse_ptr;
@@ -318,7 +315,7 @@ public:
 	}
 
 	void remove_target(node*& target_ptr) {
-		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {						//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 			replace_with_inorder_successor(target_ptr);
 		}
 		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
@@ -344,29 +341,28 @@ int main() {
 	test_tree.insert(6, 3636);
 	test_tree.insert(1, 5151);
 	test_tree.insert(8, 5858);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(7);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(3);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(5);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(4);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(6);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(1);
-	test_tree.postorder_traverse_print();
+	test_tree.preorder_print();
 
 	test_tree.remove(8);
-	test_tree.postorder_traverse_print();
-
+	test_tree.preorder_print();
 	delete &test_tree;
 	return 0;
 }
