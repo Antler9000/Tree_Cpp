@@ -1,7 +1,6 @@
 #ifndef TREE_USING_RECURSE_H
 #define TREE_USING_RECURSE_H
 
-
 #include <iostream>
 using namespace std;
 
@@ -20,29 +19,28 @@ public:
 class tree {
 	node* head;
 
+	void replace_with_inorder_predecessor();
+
+	void replace_with_inorder_successor();
+
 public:
 	tree();
 
 	~tree();
 
-	void preorder_traverse_print();
-
-	void inorder_traverse_print();
-
-	void postorder_traverse_print();
-
-	int search(int target_key);
+	int get_data(int target_key);
 
 	void insert(int new_key, int new_data);
 
-	void remove_all();
-
 	void remove(int target_key);
 
-	void replace_with_inorder_predecessor();
+	void remove_all();
 
-	void replace_with_inorder_successor();
+	void preorder_print();
+
+	void inorder_print();
+
+	void postorder_print();
 };
-
 
 #endif //TREE_USING_RECURSE_H

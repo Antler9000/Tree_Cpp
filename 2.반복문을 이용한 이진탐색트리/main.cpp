@@ -1,4 +1,4 @@
-#include "tree_using_recurse.h"
+#include "tree_using_while.h"
 
 int main() {
 	tree& test_tree = *(new tree());
@@ -7,32 +7,30 @@ int main() {
 	test_tree.insert(3, 1313);
 	test_tree.insert(4, 2424);
 	test_tree.insert(6, 3636);
-	cout << "traverse" << endl;
+	test_tree.insert(1, 5151);
+	test_tree.insert(8, 5858);
 	test_tree.preorder_print();
 
 	test_tree.remove(7);
-	cout << "traverse" << endl;
-	test_tree.preorder_print();
-
-	test_tree.remove(5);
-	cout << "traverse" << endl;
-	test_tree.preorder_print();
-
-	test_tree.remove(6);
-	cout << "traverse" << endl;
-	test_tree.preorder_print();
-
-	test_tree.remove(4);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove(3);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
-	test_tree.remove_all();
-	cout << "traverse" << endl;
+	test_tree.remove(5);
 	test_tree.preorder_print();
 
+	test_tree.remove(4);
+	test_tree.preorder_print();
+
+	test_tree.remove(6);
+	test_tree.preorder_print();
+
+	test_tree.remove(1);
+	test_tree.preorder_print();
+
+	test_tree.remove(8);
+	test_tree.preorder_print();
+	delete& test_tree;
 	return 0;
 }
