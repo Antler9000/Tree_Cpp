@@ -1,4 +1,4 @@
-#include "tree_using_recurse.h"
+#include "BST_using_recurse.h"
 
 int main() {
 	tree& test_tree = *(new tree());
