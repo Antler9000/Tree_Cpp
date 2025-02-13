@@ -1,4 +1,4 @@
-#include"tree_using_while.h"
+#include"BST_using_while.h"
 
 
 	node* tree::search(int target_key, node* (*to_do_with_target_node)(node*&), node* (*to_do_with_target_hole)(node*&)) {
@@ -91,6 +91,34 @@
 				if (present_node && present_node->rchild && present_node->rchild == previous_node) new_right_spine = false;
 				else new_right_spine = true;
 			}
+		}
+	}
+
+	void tree::remove_childs(node* node_ptr) {
+		if (node_ptr->lchild) {
+			delete node_ptr->lchild;
+			node_ptr->lchild = NULL;
+		}
+		if (node_ptr->rchild) {
+			delete node_ptr->rchild;
+			node_ptr->rchild = NULL;
+		}
+	}
+
+	node* tree::remove_target(node*& target_ptr) {
+		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+			replace_with_inorder_successor(target_ptr);
+		}
+		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
+			replace_with_inorder_successor(target_ptr);
+		}
+		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
+			replace_with_inorder_predecessor(target_ptr);
+		}
+		else {
+			delete target_ptr;
+			target_ptr = NULL;
+			return target_ptr;
 		}
 	}
 

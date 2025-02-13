@@ -1,4 +1,4 @@
-#include "tree_using_while.h"
+#include "BST_using_while.h"
 
 int main() {
 	tree& test_tree = *(new tree());

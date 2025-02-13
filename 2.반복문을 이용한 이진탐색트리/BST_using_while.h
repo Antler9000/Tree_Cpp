@@ -1,5 +1,5 @@
-#ifndef TREE_USING_WHILE_H
-#define TREE_USING_WHILE_H
+#ifndef BST_USING_WHILE_H
+#define BST_USING_WHILE_H
 
 
 #include <iostream>
@@ -97,16 +97,7 @@ class tree {
 		cout << "node key : " << node_ptr->key << " / node data : " << node_ptr->data << endl;
 	}
 
-	static void remove_childs(node* node_ptr) {
-		if (node_ptr->lchild) {
-			delete node_ptr->lchild;
-			node_ptr->lchild = NULL;
-		}
-		if (node_ptr->rchild) {
-			delete node_ptr->rchild;
-			node_ptr->rchild = NULL;
-		}
-	}
+	static void remove_childs(node* node_ptr);
 
 	static node* get_node(node*& parent_seat) {
 		return parent_seat;
@@ -116,22 +107,7 @@ class tree {
 		return parent_seat = new node(0, 0);
 	}
 
-	static node* remove_target(node*& target_ptr) {
-		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
-			replace_with_inorder_successor(target_ptr);
-		}
-		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
-			replace_with_inorder_successor(target_ptr);
-		}
-		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
-			replace_with_inorder_predecessor(target_ptr);
-		}
-		else {
-			delete target_ptr;
-			target_ptr = NULL;
-			return target_ptr;
-		}
-	}
+	static node* remove_target(node*& target_ptr);
 
 	static void replace_with_inorder_predecessor(node*& target_ptr);
 
@@ -190,4 +166,4 @@ public:
 	}
 };
 
-#endif //TREE_USING_WHILE_H
+#endif //BST_USING_WHILE_H
