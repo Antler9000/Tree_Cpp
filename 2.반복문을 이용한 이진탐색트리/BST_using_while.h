@@ -1,18 +1,16 @@
 #ifndef BST_USING_WHILE_H
 #define BST_USING_WHILE_H
 
+#include "stack.h"
 
-#include <iostream>
-using namespace std;
-
-class node {
+class tree_node {
 	friend class tree;
 	int key;
 	int data;
-	node* lchild;
-	node* rchild;
+	tree_node* lchild;
+	tree_node* rchild;
 
-	node(int key, int data) {
+	tree_node(int key, int data) {
 		this->key = key;
 		this->data = data;
 		this->lchild = NULL;
@@ -28,90 +26,44 @@ class node {
 	}
 };
 
-//일단 스택이 가지는 아이템의 타입은 node*이고, 최대 개수는 100개라고 가정하고 어레이 구현을 사용함.
-class stack {
-	node* head_data[100];
-	int item_num;
-
-public:
-	stack() {
-		for (int i = 0; i < 100; i++) {
-			head_data[i] = NULL;
-		}
-		item_num = 0;
-	}
-
-	void push(node* new_head) {
-		if (item_num >= 99) {
-			cout << "cannot push to stack. it is full!" << endl;
-			return;
-		}
-		head_data[item_num] = new_head;
-		item_num++;
-	}
-
-	node* pop() {
-		if (item_num <= 0) {
-			cout << "cannot pop from stack. it is emptied!" << endl;
-			return NULL;
-		}
-
-		return head_data[--item_num];
-	}
-
-	node* get_top() {
-		if (item_num <= 0) {
-			cout << "cannot get top from stack. it is emptied!" << endl;
-			return NULL;
-		}
-
-		return head_data[item_num - 1];
-	}
-
-	bool is_empty() {
-		if (item_num <= 0) return true;
-		else return false;
-	}
-};
-
 class tree {
-	node* head;
+	tree_node* head;
 
-	//"to_do_with_target_node" 함수 포인터는 특정 target_key를 가진 트리상 노드에 수행할 작업을 위한 인터페이스임
+	//"to_do_with_target_tree_node" 함수 포인터는 특정 target_key를 가진 트리상 노드에 수행할 작업을 위한 인터페이스임
 	//"to_do_with_target_hole" 함수 포인터는 특정 target_key가 새로 삽입되기에 적합한 위치(자식 포인터 변수)에 수행할 작업을 위한 인터페이스임
 	//두 함수 포인터 모두, 부모의 자식 포인터 변수를 직접 수정할 수 있도록 레퍼런스 인자를 가짐
-	node* search(int target_key, node* (*to_do_with_target_node)(node*&), node* (*to_do_with_target_hole)(node*&));
+	tree_node* search(int target_key, tree_node* (*to_do_with_target_tree_node)(tree_node*&), tree_node* (*to_do_with_target_hole)(tree_node*&));
 
 	//"to_do' 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void preorder_traverse(void (*to_do)(node*));
+	void preorder_traverse(void (*to_do)(tree_node*));
 
 	//"to_do' 함수 포인터는 중위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void inorder_traverse(void (*to_do)(node*));
+	void inorder_traverse(void (*to_do)(tree_node*));
 
 	//"to_do' 함수 포인터는 후위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void postorder_traverse(void (*to_do)(node*));
+	void postorder_traverse(void (*to_do)(tree_node*));
 
 	/*-----이 아래의 private 메소드들은 위 일반 메소드들(탐색, 순회)에 메소드 포인터(인터페이스)로 전달되어 동작하는 세부 메소드들임-----*/
 
-	static void print_node(node* node_ptr) {
-		cout << "node key : " << node_ptr->key << " / node data : " << node_ptr->data << endl;
+	static void print_tree_node(tree_node* tree_node_ptr) {
+		cout << "tree_node key : " << tree_node_ptr->key << " / tree_node data : " << tree_node_ptr->data << endl;
 	}
 
-	static void remove_childs(node* node_ptr);
+	static void remove_childs(tree_node* tree_node_ptr);
 
-	static node* get_node(node*& parent_seat) {
+	static tree_node* get_tree_node(tree_node*& parent_seat) {
 		return parent_seat;
 	}
 
-	static node* set_dummy_child(node*& parent_seat) {
-		return parent_seat = new node(0, 0);
+	static tree_node* set_dummy_child(tree_node*& parent_seat) {
+		return parent_seat = new tree_node(0, 0);
 	}
 
-	static node* remove_target(node*& target_ptr);
+	static tree_node* remove_target(tree_node*& target_ptr);
 
-	static void replace_with_inorder_predecessor(node*& target_ptr);
+	static void replace_with_inorder_predecessor(tree_node*& target_ptr);
 
-	static void replace_with_inorder_successor(node*& target_ptr);
+	static void replace_with_inorder_successor(tree_node*& target_ptr);
 
 public:
 	tree() {
@@ -125,12 +77,12 @@ public:
 	}
 
 	int get_data(int target_key) {
-		node* target_node = search(target_key, &tree::get_node, NULL);
-		return target_node->data;
+		tree_node* target_tree_node = search(target_key, &tree::get_tree_node, NULL);
+		return target_tree_node->data;
 	}
 
-	node* insert(int new_key, int new_data) {
-		node* made_child = search(new_key, NULL, &tree::set_dummy_child);
+	tree_node* insert(int new_key, int new_data) {
+		tree_node* made_child = search(new_key, NULL, &tree::set_dummy_child);
 		made_child->set_key(new_key);
 		made_child->set_data(new_data);
 		return made_child;
@@ -149,19 +101,19 @@ public:
 
 	void preorder_print() {
 		cout << "preorder_traverse" << endl;
-		preorder_traverse(&tree::print_node);
+		preorder_traverse(&tree::print_tree_node);
 		cout << endl;
 	}
 
 	void inorder_print() {
 		cout << "inorder_traverse" << endl;
-		inorder_traverse(&tree::print_node);
+		inorder_traverse(&tree::print_tree_node);
 		cout << endl;
 	}
 
 	void postorder_print() {
 		cout << "postorder_traverse" << endl;
-		postorder_traverse(&tree::print_node);
+		postorder_traverse(&tree::print_tree_node);
 		cout << endl;
 	}
 };
