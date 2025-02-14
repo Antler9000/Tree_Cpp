@@ -1,16 +1,6 @@
 #include <iostream>
-#include "tree_using_recurse.h"
+#include "BST_using_recurse.h"
 using namespace std;
-
-
-
-node::node(int key, int data) {
-	cout << "node is made!" << endl;
-	this->key = key;
-	this->data = data;
-	this->lchild = NULL;
-	this->rchild = NULL;
-}
 
 void tree::replace_with_inorder_predecessor() {
 	tree* previous_ptr = NULL;
@@ -38,15 +28,6 @@ void tree::replace_with_inorder_successor() {
 	head->key = traverse_ptr->head->key;
 	head->data = traverse_ptr->head->data;
 	delete traverse_ptr;
-}
-
-tree::tree() {
-	cout << "tree is made!" << endl;
-	head = NULL;
-}
-
-tree::~tree() {
-	remove_all();
 }
 
 int tree::get_data(int target_key) {
@@ -128,46 +109,6 @@ void tree::remove(int target_key) {
 			head = NULL;
 		}
 	}
-}
-
-void tree::remove_all() {
-	if (head != NULL) {
-		if (head->lchild != NULL) head->lchild->remove_all();
-		if (head->rchild != NULL) head->rchild->remove_all();
-		delete head;
-		head = NULL;
-	}
-}
-
-void tree::preorder_print() {
-	if (head == NULL) {
-		cout << "cannot traverse. head is NULL." << endl;
-		return;
-	}
-	cout << "node key : " << head->key << " / node data : " << head->data << endl;
-	if (head->lchild != NULL) head->lchild->preorder_print();
-	if (head->rchild != NULL) head->rchild->preorder_print();
-}
-
-void tree::inorder_print() {
-	if (head == NULL) {
-		cout << "cannot traverse. head is NULL." << endl;
-		return;
-	}
-	if (head->lchild != NULL) head->lchild->inorder_print();
-	cout << "node key : " << head->key << " / node data : " << head->data << endl;
-	if (head->rchild != NULL) head->rchild->inorder_print();
-}
-
-
-void tree::postorder_print() {
-	if (head == NULL) {
-		cout << "cannot traverse. head is NULL." << endl;
-		return;
-	}
-	if (head->lchild != NULL) head->lchild->postorder_print();
-	if (head->rchild != NULL) head->rchild->postorder_print();
-	cout << "node key : " << head->key << " / node data : " << head->data << endl;
 }
 
 
