@@ -16,14 +16,6 @@ class tree_node {
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
-
-	void set_key(int key) {
-		this->key = key;
-	}
-
-	void set_data(int data) {
-		this->data = data;
-	}
 };
 
 class tree {
@@ -34,22 +26,35 @@ class tree {
 	//두 함수 포인터 모두, 부모의 자식 포인터 변수를 직접 수정할 수 있도록 레퍼런스 인자를 가짐
 	tree_node* search(int target_key, tree_node* (*to_do_with_target_tree_node)(tree_node*&), tree_node* (*to_do_with_target_hole)(tree_node*&));
 
-	//"to_do' 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void preorder_traverse(void (*to_do)(tree_node*));
+	//"to_do_while_traverse" 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
+	//"optional_target_tree" 트리 포인터는 앞선 "to_do_while_traverse" 작업에서 대상 트리 포인터가 필요한 경우를 위한 인수임.
+	// (eg: 기존 'A' 트리를 순회하며 각 노드를 'B' 트리에 복사 삽입할 때'B' 트리를 가리키기 위한 포인터임)
+	void preorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
 
-	//"to_do' 함수 포인터는 중위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void inorder_traverse(void (*to_do)(tree_node*));
+	void inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
 
-	//"to_do' 함수 포인터는 후위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	void postorder_traverse(void (*to_do)(tree_node*));
+	void postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
 
-	/*-----이 아래의 private 메소드들은 위 일반 메소드들(탐색, 순회)에 메소드 포인터(인터페이스)로 전달되어 동작하는 세부 메소드들임-----*/
+	/*-----이 아래의 private 메소드들은 위 일반 메소드들(탐색, 순회)에 메소드 포인터(인터페이스)로 전달되어 동작하는 세부 메소드나 그 메소드의 하위 메소드들임-----*/
 
-	static void print_tree_node(tree_node* tree_node_ptr) {
-		cout << "tree_node key : " << tree_node_ptr->key << " / tree_node data : " << tree_node_ptr->data << endl;
+	static void print_tree_node(tree_node* target_node, tree* dummy_argument) {
+		cout << "tree_node key : " << target_node->key << " / tree_node data : " << target_node->data << endl;
 	}
 
-	static void remove_childs(tree_node* tree_node_ptr);
+	static void remove_childs(tree_node* target_node, tree* dummy_argument) {
+		if (target_node->lchild) {
+			delete target_node->lchild;
+			target_node->lchild = NULL;
+		}
+		if (target_node->rchild) {
+			delete target_node->rchild;
+			target_node->rchild = NULL;
+		}
+	}
+
+	static void copy_node(tree_node* source_node, tree* dest_tree) {
+		dest_tree->insert(source_node->key, source_node->data);
+	}
 
 	static tree_node* get_tree_node(tree_node*& parent_seat) {
 		return parent_seat;
@@ -81,11 +86,14 @@ public:
 		return target_tree_node->data;
 	}
 
-	tree_node* insert(int new_key, int new_data) {
+	void insert(int new_key, int new_data) {
 		tree_node* made_child = search(new_key, NULL, &tree::set_dummy_child);
-		made_child->set_key(new_key);
-		made_child->set_data(new_data);
-		return made_child;
+		made_child->key = new_key;
+		made_child->data = new_data;
+	}
+
+	void copy_from(tree* target_tree) {
+		target_tree->preorder_traverse(&tree::copy_node, this);
 	}
 
 	void remove(int target_key) {
@@ -94,26 +102,26 @@ public:
 
 	void remove_all() {
 		cout << "remove all" << endl;
-		postorder_traverse(&tree::remove_childs);
+		postorder_traverse(&tree::remove_childs, NULL);
 		delete head;
 		head = NULL;
 	}
 
 	void preorder_print() {
 		cout << "preorder_traverse" << endl;
-		preorder_traverse(&tree::print_tree_node);
+		preorder_traverse(&tree::print_tree_node, NULL);
 		cout << endl;
 	}
 
 	void inorder_print() {
 		cout << "inorder_traverse" << endl;
-		inorder_traverse(&tree::print_tree_node);
+		inorder_traverse(&tree::print_tree_node, NULL);
 		cout << endl;
 	}
 
 	void postorder_print() {
 		cout << "postorder_traverse" << endl;
-		postorder_traverse(&tree::print_tree_node);
+		postorder_traverse(&tree::print_tree_node, NULL);
 		cout << endl;
 	}
 };

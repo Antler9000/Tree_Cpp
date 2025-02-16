@@ -11,6 +11,10 @@ int main() {
 	test_tree.insert(8, 5858);
 	test_tree.preorder_print();
 
+	tree& copied_test_tree = *(new tree());
+	copied_test_tree.copy_from(&test_tree);
+	copied_test_tree.preorder_print();
+
 	test_tree.remove(7);
 	test_tree.preorder_print();
 
@@ -31,6 +35,7 @@ int main() {
 
 	test_tree.remove(8);
 	test_tree.preorder_print();
+
 	delete& test_tree;
 	return 0;
 }

@@ -26,7 +26,7 @@ tree_node* tree::search(int target_key, tree_node* (*to_do_with_target_tree_node
 	}
 }
 
-void tree::preorder_traverse(void (*to_do)(tree_node*)) {
+void tree::preorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
 	if (head == NULL) {
 		cout << "can not traverse. there is no tree_node." << endl;
 		return;
@@ -35,13 +35,13 @@ void tree::preorder_traverse(void (*to_do)(tree_node*)) {
 	tree_node* traverse_ptr = NULL;
 	head_stack.push(this->head);
 	while ((traverse_ptr = head_stack.pop())) {
-		(*to_do)(traverse_ptr);
+		(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
 		if (traverse_ptr->rchild != NULL) head_stack.push(traverse_ptr->rchild);
 		if (traverse_ptr->lchild != NULL) head_stack.push(traverse_ptr->lchild);
 	}
 }
 
-void tree::inorder_traverse(void (*to_do)(tree_node*)) {
+void tree::inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
 	if (head == NULL) {
 		cout << "can not traverse. there is no tree_node." << endl;
 		return;
@@ -55,7 +55,7 @@ void tree::inorder_traverse(void (*to_do)(tree_node*)) {
 			head_stack.push(head_stack.get_top()->lchild);
 		}
 		traverse_ptr = head_stack.pop();
-		(*to_do)(traverse_ptr);
+		(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
 		if (traverse_ptr->rchild) {
 			new_left_spine = true;
 			head_stack.push(traverse_ptr->rchild);
@@ -64,7 +64,7 @@ void tree::inorder_traverse(void (*to_do)(tree_node*)) {
 	}
 }
 
-void tree::postorder_traverse(void (*to_do)(tree_node*)) {
+void tree::postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
 	if (head == NULL) {
 		cout << "can not traverse. there is no tree_node." << endl;
 		return;
@@ -84,7 +84,7 @@ void tree::postorder_traverse(void (*to_do)(tree_node*)) {
 			head_stack.push(traverse_ptr->rchild);
 		}
 		else {
-			(*to_do)(traverse_ptr);
+			(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
 			new_left_spine = false;
 			tree_node* previous_tree_node = head_stack.pop();
 			tree_node* present_tree_node = head_stack.get_top();
@@ -94,16 +94,7 @@ void tree::postorder_traverse(void (*to_do)(tree_node*)) {
 	}
 }
 
-void tree::remove_childs(tree_node* tree_node_ptr) {
-	if (tree_node_ptr->lchild) {
-		delete tree_node_ptr->lchild;
-		tree_node_ptr->lchild = NULL;
-	}
-	if (tree_node_ptr->rchild) {
-		delete tree_node_ptr->rchild;
-		tree_node_ptr->rchild = NULL;
-	}
-}
+
 
 tree_node* tree::remove_target(tree_node*& target_ptr) {
 	if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
