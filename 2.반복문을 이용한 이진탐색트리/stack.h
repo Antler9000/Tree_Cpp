@@ -29,7 +29,7 @@ public:
 	}
 
 	void push(T data) {
-		if (!head) {
+		if (head == NULL) {
 			head = new stack_node<T>(data);
 		}
 		else {
@@ -42,12 +42,12 @@ public:
 	}
 
 	T pop() {
-		if (!head) {
+		if (head == NULL) {
 			cout << "cannot pop from stack. it is emptied!" << endl;
 			return NULL;
 		}
 
-		if (!head->child) {
+		if (head->child == NULL) {
 			T temp = head->data;
 			delete head;
 			head = NULL;
@@ -55,7 +55,7 @@ public:
 		}
 		else {
 			stack_node<T>* traverse_ptr = head;
-			while (traverse_ptr->child->child) {
+			while (traverse_ptr->child->child != NULL) {
 				traverse_ptr = traverse_ptr->child;
 			}
 			T temp = traverse_ptr->child->data;
@@ -66,12 +66,12 @@ public:
 	}
 
 	T get_top() {
-		if (!head) {
+		if (head == NULL) {
 			cout << "cannot get top from stack. it is emptied!" << endl;
 			return NULL;
 		}
 
-		if (!head->child) {
+		if (head->child == NULL) {
 			return head->data;
 		}
 		else {
@@ -84,7 +84,7 @@ public:
 	}
 
 	bool is_empty() {
-		if (!head) return true;
+		if (head == NULL) return true;
 		else return false;
 	}
 };
