@@ -10,6 +10,11 @@ int main() {
 	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
+	tree& copied_tree = *(new tree());
+	copied_tree.copy_from(&test_tree);
+	cout << "traverse" << endl;
+	copied_tree.preorder_print();
+
 	test_tree.remove(7);
 	cout << "traverse" << endl;
 	test_tree.preorder_print();
