@@ -56,7 +56,7 @@ void tree::inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tre
 		}
 		traverse_ptr = head_stack.pop();
 		(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
-		if (traverse_ptr->rchild) {
+		if (traverse_ptr->rchild != NULL) {
 			new_left_spine = true;
 			head_stack.push(traverse_ptr->rchild);
 		}

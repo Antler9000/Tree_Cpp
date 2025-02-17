@@ -42,11 +42,11 @@ class tree {
 	}
 
 	static void remove_childs(tree_node* target_node, tree* dummy_argument) {
-		if (target_node->lchild) {
+		if (target_node->lchild != NULL) {
 			delete target_node->lchild;
 			target_node->lchild = NULL;
 		}
-		if (target_node->rchild) {
+		if (target_node->rchild != NULL) {
 			delete target_node->rchild;
 			target_node->rchild = NULL;
 		}
