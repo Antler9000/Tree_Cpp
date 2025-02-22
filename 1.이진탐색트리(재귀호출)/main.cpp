@@ -7,36 +7,28 @@ int main() {
 	test_tree.insert(3, 1313);
 	test_tree.insert(4, 2424);
 	test_tree.insert(6, 3636);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	tree& copied_tree = *(new tree());
 	copied_tree.copy_from(&test_tree);
-	cout << "traverse" << endl;
 	copied_tree.preorder_print();
 
 	test_tree.remove(7);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove(5);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove(6);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove(4);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove(3);
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	test_tree.remove_all();
-	cout << "traverse" << endl;
 	test_tree.preorder_print();
 
 	return 0;
