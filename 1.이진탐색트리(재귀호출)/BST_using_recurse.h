@@ -4,33 +4,35 @@
 #include <iostream>
 using namespace std;
 
-class node {
-	friend class tree;
-	int key;
-	int data;
-	tree* lchild;
-	tree* rchild;
-
-
-public:
-	node(int key, int data) {
-		this->key = key;
-		this->data = data;
-		this->lchild = NULL;
-		this->rchild = NULL;
-	}
-};
 
 class tree {
-	node* head;
+	int data;
+	int key;
+	tree* lchild;
+	tree* rchild;
 
 	void replace_with_inorder_predecessor();
 
 	void replace_with_inorder_successor();
 
+	//부모가 가리키는 자식에 대한 정보를 NULL로 바꿔야하므로, 레퍼런스 인자로 받음
+	void remove_target(tree*& target_child_variable);
+
 public:
+	//트리의 헤드노드는 키와 데이터가 모두 -1 값인 더미 노드이다.
+	//이는 트리 클래스가 별도의 노드 클래스 없이 재귀적으로 정의되었기에, 헤드노드를 NULL과 같이 표기할 수단이 마땅히 없어서 더미 노드를 두기로 하였다.
 	tree() {
-		head = NULL;
+		this->key = -1;
+		this->data = -1;
+		this->lchild = NULL;
+		this->rchild = NULL;
+	}
+
+	tree(int key, int data) {
+		this->key = key;
+		this->data = data;
+		this->lchild = NULL;
+		this->rchild = NULL;
 	}
 
 	~tree() {
@@ -41,63 +43,47 @@ public:
 
 	void insert(int new_key, int new_data);
 
-	void copy_from(tree* target_tree) {
-		if (target_tree == NULL) {
-			cout << "no more thing to copy_from. target_tree is NULL." << endl;
-			return;
-		}
-		
-		insert(target_tree->head->key, target_tree->head->data);
-		copy_from(target_tree->head->lchild);
-		copy_from(target_tree->head->rchild);
+	void copy_from(tree* target_tree) {		
+		if (target_tree == NULL) return;
+
+		insert(target_tree->key, target_tree->data);
+		copy_from(target_tree->lchild);
+		copy_from(target_tree->rchild);
 	}
 
 	void remove(int target_key);
 
 	void remove_all() {
-		if (head == NULL) {
-			cout << "cannot remove_all. head is NULL." << endl;
-			return;
-		}
+		if (lchild != NULL) lchild->remove_all();
+		if (rchild != NULL) rchild->remove_all();
 
-		if (head->lchild != NULL) head->lchild->remove_all();
-		if (head->rchild != NULL) head->rchild->remove_all();
-		delete head;
-		head = NULL;
+		if (lchild != NULL) delete lchild;
+		if (rchild != NULL) delete rchild;
 	}
 
 	void preorder_print() {
-		if (head == NULL) {
-			cout << "cannot traverse. head is NULL." << endl;
-			return;
-		}
+		if (key == -1 && data == -1) cout << "traverse..." << endl;
 
-		cout << "node key : " << head->key << " / node data : " << head->data << endl;
-		if (head->lchild != NULL) head->lchild->preorder_print();
-		if (head->rchild != NULL) head->rchild->preorder_print();
+		cout << "node key : " << key << " / node data : " << data << endl;
+		if (lchild != NULL) lchild->preorder_print();
+		if (rchild != NULL) rchild->preorder_print();
 	}
 
 	void inorder_print() {
-		if (head == NULL) {
-			cout << "cannot traverse. head is NULL." << endl;
-			return;
-		}
+		if (key == -1 && data == -1) cout << "traverse..." << endl;
 
-		if (head->lchild != NULL) head->lchild->inorder_print();
-		cout << "node key : " << head->key << " / node data : " << head->data << endl;
-		if (head->rchild != NULL) head->rchild->inorder_print();
+		if (lchild != NULL) lchild->preorder_print();
+		cout << "node key : " << key << " / node data : " << data << endl;
+		if (rchild != NULL) rchild->preorder_print();
 	}
 
 
 	void postorder_print() {
-		if (head == NULL) {
-			cout << "cannot traverse. head is NULL." << endl;
-			return;
-		}
+		if (key == -1 && data == -1) cout << "traverse...." << endl;
 
-		if (head->lchild != NULL) head->lchild->postorder_print();
-		if (head->rchild != NULL) head->rchild->postorder_print();
-		cout << "node key : " << head->key << " / node data : " << head->data << endl;
+		if (lchild != NULL) lchild->preorder_print();
+		if (rchild != NULL) rchild->preorder_print();
+		cout << "node key : " << key << " / node data : " << data << endl;
 	}
 
 };
