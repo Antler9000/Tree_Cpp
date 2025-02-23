@@ -3,34 +3,23 @@
 
 BST_node* BST::search(int target_key, BST_node* (BST::* to_do_with_target_ptr)(BST_node*&)) {
 	if (head == NULL) return (this->*to_do_with_target_ptr)(head);
+	else if(target_key == head->key) return (this->*to_do_with_target_ptr)(head);
 
 	BST_node* search_ptr = head;
 	while (true) {
 		if (target_key < search_ptr->key) {
-			if (search_ptr->lchild != NULL) {
-				if (search_ptr->lchild->key == target_key) return (this->*to_do_with_target_ptr)(search_ptr->lchild);
-				else search_ptr = search_ptr->lchild;
-			}
+			if (search_ptr->lchild != NULL && search_ptr->lchild->key != target_key)  search_ptr = search_ptr->lchild;
 			else return (this->*to_do_with_target_ptr)(search_ptr->lchild);
 		}
-		else if (search_ptr->key < target_key) {
-			if (search_ptr->rchild != NULL) {
-				if (search_ptr->rchild->key == target_key) return (this->*to_do_with_target_ptr)(search_ptr->rchild);
-				else search_ptr = search_ptr->rchild;
-			}
-			else return (this->*to_do_with_target_ptr)(search_ptr->rchild);
-		}
 		else {
-			return (this->*to_do_with_target_ptr)(head);
+			if (search_ptr->rchild != NULL && search_ptr->rchild->key != target_key)search_ptr = search_ptr->rchild;
+			else return (this->*to_do_with_target_ptr)(search_ptr->rchild);
 		}
 	}
 }
 
 void BST::preorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
-	if (head == NULL) {
-		cout << "can not traverse. there is no BST_node." << endl;
-		return;
-	}
+	if (head == NULL) return;
 
 	stack<BST_node*> head_stack;
 	BST_node* traverse_ptr = NULL;
@@ -43,37 +32,29 @@ void BST::preorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* 
 }
 
 void BST::inorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
-	if (head == NULL) {
-		cout << "can not traverse. there is no BST_node." << endl;
-		return;
-	}
+	if (head == NULL) return;
 
 	stack<BST_node*> head_stack;
-	BST_node* traverse_ptr = NULL;
 	head_stack.push(head);
 	bool new_left_spine = true;
 	while (!head_stack.is_empty()) {
 		while (new_left_spine && head_stack.get_top()->lchild) {
 			head_stack.push(head_stack.get_top()->lchild);
 		}
-		traverse_ptr = head_stack.pop();
+		BST_node* traverse_ptr = head_stack.pop();
 		(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
 		if (traverse_ptr->rchild != NULL) {
-			new_left_spine = true;
 			head_stack.push(traverse_ptr->rchild);
+			new_left_spine = true;
 		}
 		else new_left_spine = false;
 	}
 }
 
 void BST::postorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
-	if (head == NULL) {
-		cout << "can not traverse. there is no BST_node." << endl;
-		return;
-	}
+	if (head == NULL) return;
 
 	stack<BST_node*> head_stack;
-	BST_node* traverse_ptr = NULL;
 	head_stack.push(head);
 	bool new_left_spine = true;
 	bool new_right_spine = true;
@@ -81,17 +62,16 @@ void BST::postorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST*
 		while (new_left_spine && head_stack.get_top()->lchild) {
 			head_stack.push(head_stack.get_top()->lchild);
 		}
-		traverse_ptr = head_stack.get_top();
-		if (new_right_spine && traverse_ptr->rchild) {
+		if (new_right_spine && head_stack.get_top()->rchild) {
+			head_stack.push(head_stack.get_top()->rchild);
 			new_left_spine = true;
-			head_stack.push(traverse_ptr->rchild);
 		}
 		else {
-			(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
+			(*to_do_while_traverse)(head_stack.get_top(), optional_target_BST);
 			new_left_spine = false;
 			BST_node* previous_BST_node = head_stack.pop();
 			BST_node* present_BST_node = head_stack.get_top();
-			if (present_BST_node && present_BST_node->rchild && present_BST_node->rchild == previous_BST_node) new_right_spine = false;
+			if (present_BST_node && present_BST_node->rchild && (present_BST_node->rchild == previous_BST_node)) new_right_spine = false;
 			else new_right_spine = true;
 		}
 	}

@@ -109,21 +109,21 @@ public:
 	}
 
 	void preorder_print() {
-		cout << "preorder_traverse" << endl;
+		cout << "preorder traverse start" << endl;
 		preorder_traverse(&BST::print_BST_node, NULL);
-		cout << endl;
+		cout << "traverse ended" << endl << endl;
 	}
 
 	void inorder_print() {
-		cout << "inorder_traverse" << endl;
+		cout << "inorder traverse start" << endl;
 		inorder_traverse(&BST::print_BST_node, NULL);
-		cout << endl;
+		cout << "traverse ended" << endl << endl;
 	}
 
 	void postorder_print() {
-		cout << "postorder_traverse" << endl;
+		cout << "postorder traverse start" << endl;
 		postorder_traverse(&BST::print_BST_node, NULL);
-		cout << endl;
+		cout << "traverse ended" << endl << endl;
 	}
 };
 
