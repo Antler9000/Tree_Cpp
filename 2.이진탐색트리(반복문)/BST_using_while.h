@@ -3,14 +3,14 @@
 
 #include "stack.h"
 
-class tree_node {
-	friend class tree;
+class BST_node {
+	friend class BST;
 	int key;
 	int data;
-	tree_node* lchild;
-	tree_node* rchild;
+	BST_node* lchild;
+	BST_node* rchild;
 
-	tree_node(int key, int data) {
+	BST_node(int key, int data) {
 		this->key = key;
 		this->data = data;
 		this->lchild = NULL;
@@ -18,30 +18,42 @@ class tree_node {
 	}
 };
 
-class tree {
-	tree_node* head;
+class BST {
+	BST_node* head;
 
-	//"to_do_with_target_tree_node" 함수 포인터는 특정 target_key를 가진 트리상 노드에 수행할 작업을 위한 인터페이스임
-	//"to_do_with_target_hole" 함수 포인터는 특정 target_key가 새로 삽입되기에 적합한 위치(자식 포인터 변수)에 수행할 작업을 위한 인터페이스임
-	//두 함수 포인터 모두, 부모의 자식 포인터 변수를 직접 수정할 수 있도록 레퍼런스 인자를 가짐
-	tree_node* search(int target_key, tree_node* (*to_do_with_target_tree_node)(tree_node*&), tree_node* (*to_do_with_target_hole)(tree_node*&));
+	//"to_do_with_target_ptr" 메소드 포인터는 특정 target_key를 가진 노드를 가리키는 자식 포인터에 수행할 작업이나,
+	//특정 target_key 노드가 삽입될 수 있는 NULL 자식 포인터에 수행할 작업을 넘겨주는 인터페이스임.
+	//응용되는 삽입-검색-삭제에서는 부모가 자식을 가리키는 포인터 변수를 직접 수정할 수 있어야 하기에, 메소드 포인터는 레퍼런스 인자를 가짐
+	BST_node* search(int target_key, BST_node* (BST::*to_do_with_target_ptr)(BST_node*&));
 
-	//"to_do_while_traverse" 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
-	//"optional_target_tree" 트리 포인터는 앞선 "to_do_while_traverse" 작업에서 대상 트리 포인터가 필요한 경우를 위한 인수임.
-	// (eg: 기존 'A' 트리를 순회하며 각 노드를 'B' 트리에 복사 삽입할 때'B' 트리를 가리키기 위한 포인터임)
-	void preorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
-
-	void inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
-
-	void postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree);
-
-	/*-----이 아래의 private 메소드들은 위 일반 메소드들(탐색, 순회)에 메소드 포인터(인터페이스)로 전달되어 동작하는 세부 메소드나 그 메소드의 하위 메소드들임-----*/
-
-	static void print_tree_node(tree_node* target_node, tree* dummy_argument) {
-		cout << "tree_node key : " << target_node->key << " / tree_node data : " << target_node->data << endl;
+	BST_node* get_BST_node(BST_node*& parent_seat) {
+		return parent_seat;
 	}
 
-	static void remove_childs(tree_node* target_node, tree* dummy_argument) {
+	BST_node* set_dummy_child(BST_node*& parent_seat) {
+		return parent_seat = new BST_node(0, 0);
+	}
+
+	BST_node* remove_target(BST_node*& target_ptr);
+
+	void replace_with_inorder_predecessor(BST_node*& target_ptr);
+
+	void replace_with_inorder_successor(BST_node*& target_ptr);
+
+
+	//"to_do_while_traverse" 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
+	//"optional_target_BST" BST 포인터는 앞선 "to_do_while_traverse" 작업에서 대상 BST 포인터가 필요한 경우를 위한 인수임.
+	void preorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST);
+
+	void inorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST);
+
+	void postorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST);
+
+	static void print_BST_node(BST_node* target_node, BST* dummy_argument) {
+		cout << "BST_node key : " << target_node->key << " / BST_node data : " << target_node->data << endl;
+	}
+
+	static void remove_childs(BST_node* target_node, BST* dummy_argument) {
 		if (target_node->lchild != NULL) {
 			delete target_node->lchild;
 			target_node->lchild = NULL;
@@ -52,77 +64,66 @@ class tree {
 		}
 	}
 
-	static void copy_node(tree_node* source_node, tree* dest_tree) {
-		dest_tree->insert(source_node->key, source_node->data);
+	static void copy_node(BST_node* source_node, BST* dest_BST) {
+		dest_BST->insert(source_node->key, source_node->data);
 	}
 
-	static tree_node* get_tree_node(tree_node*& parent_seat) {
-		return parent_seat;
-	}
-
-	static tree_node* set_dummy_child(tree_node*& parent_seat) {
-		return parent_seat = new tree_node(0, 0);
-	}
-
-	static tree_node* remove_target(tree_node*& target_ptr);
-
-	static void replace_with_inorder_predecessor(tree_node*& target_ptr);
-
-	static void replace_with_inorder_successor(tree_node*& target_ptr);
 
 public:
-	tree() {
-		cout << "tree is being made!" << endl;
+	BST() {
+		cout << "BST is being made!" << endl;
 		head = NULL;
 	}
 
-	~tree() {
-		cout << "tree is being removed" << endl;
+	~BST() {
+		cout << "BST is being removed" << endl;
 		remove_all();
 	}
 
-	int get_data(int target_key) {
-		tree_node* target_tree_node = search(target_key, &tree::get_tree_node, NULL);
-		return target_tree_node->data;
-	}
-
+	//삽입
 	void insert(int new_key, int new_data) {
-		tree_node* made_child = search(new_key, NULL, &tree::set_dummy_child);
+		BST_node* made_child = search(new_key, &BST::set_dummy_child);
 		made_child->key = new_key;
 		made_child->data = new_data;
 	}
 
-	void copy_from(tree* target_tree) {
-		target_tree->preorder_traverse(&tree::copy_node, this);
+	//검색
+	int retrieve(int target_key) {
+		return search(target_key, &BST::get_BST_node)->data;
 	}
 
+	//삭제
 	void remove(int target_key) {
-		search(target_key, &tree::remove_target, NULL);
+		search(target_key, &BST::remove_target);
+	}
+
+	void copy_from(BST* target_BST) {
+		target_BST->preorder_traverse(&BST::copy_node, this);
 	}
 
 	void remove_all() {
 		cout << "remove all" << endl;
-		postorder_traverse(&tree::remove_childs, NULL);
+		postorder_traverse(&BST::remove_childs, NULL);
 		delete head;
 		head = NULL;
 	}
 
 	void preorder_print() {
-		cout << "preorder_traverse" << endl;
-		preorder_traverse(&tree::print_tree_node, NULL);
-		cout << endl;
+		cout << "preorder traverse start" << endl;
+		preorder_traverse(&BST::print_BST_node, NULL);
+		cout << "traverse ended" << endl << endl;
 	}
 
 	void inorder_print() {
-		cout << "inorder_traverse" << endl;
-		inorder_traverse(&tree::print_tree_node, NULL);
-		cout << endl;
+		cout << "inorder traverse start" << endl;
+		inorder_traverse(&BST::print_BST_node, NULL);
+		cout << "traverse ended" << endl << endl;
 	}
 
 	void postorder_print() {
-		cout << "postorder_traverse" << endl;
-		postorder_traverse(&tree::print_tree_node, NULL);
-		cout << endl;
+		cout << "postorder traverse start" << endl;
+		postorder_traverse(&BST::print_BST_node, NULL);
+		cout << "traverse ended" << endl << endl;
 	}
 };
 

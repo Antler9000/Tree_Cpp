@@ -43,7 +43,6 @@ public:
 
 	T pop() {
 		if (head == NULL) {
-			cout << "cannot pop from stack. it is emptied!" << endl;
 			return NULL;
 		}
 
@@ -67,7 +66,6 @@ public:
 
 	T get_top() {
 		if (head == NULL) {
-			cout << "cannot get top from stack. it is emptied!" << endl;
 			return NULL;
 		}
 
