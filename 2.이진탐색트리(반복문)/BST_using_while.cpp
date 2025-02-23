@@ -1,53 +1,55 @@
 #include"BST_using_while.h"
 
 
-tree_node* tree::search(int target_key, tree_node* (*to_do_with_target_tree_node)(tree_node*&), tree_node* (*to_do_with_target_hole)(tree_node*&)) {
-	if (head == NULL) return (*to_do_with_target_hole)(head);
+BST_node* BST::search(int target_key, BST_node* (BST::* to_do_with_target_ptr)(BST_node*&)) {
+	if (head == NULL) return (this->*to_do_with_target_ptr)(head);
 
-	tree_node* search_ptr = head;
+	BST_node* search_ptr = head;
 	while (true) {
 		if (target_key < search_ptr->key) {
 			if (search_ptr->lchild != NULL) {
-				if (search_ptr->lchild->key == target_key) return (*to_do_with_target_tree_node)(search_ptr->lchild);
+				if (search_ptr->lchild->key == target_key) return (this->*to_do_with_target_ptr)(search_ptr->lchild);
 				else search_ptr = search_ptr->lchild;
 			}
-			else return (*to_do_with_target_hole)(search_ptr->lchild);
+			else return (this->*to_do_with_target_ptr)(search_ptr->lchild);
 		}
 		else if (search_ptr->key < target_key) {
 			if (search_ptr->rchild != NULL) {
-				if (search_ptr->rchild->key == target_key) return (*to_do_with_target_tree_node)(search_ptr->rchild);
+				if (search_ptr->rchild->key == target_key) return (this->*to_do_with_target_ptr)(search_ptr->rchild);
 				else search_ptr = search_ptr->rchild;
 			}
-			else return (*to_do_with_target_hole)(search_ptr->rchild);
+			else return (this->*to_do_with_target_ptr)(search_ptr->rchild);
 		}
 		else {
-			return (*to_do_with_target_tree_node)(head);
+			return (this->*to_do_with_target_ptr)(head);
 		}
 	}
 }
 
-void tree::preorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
+void BST::preorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
 	if (head == NULL) {
-		cout << "can not traverse. there is no tree_node." << endl;
+		cout << "can not traverse. there is no BST_node." << endl;
 		return;
 	}
-	stack<tree_node*> head_stack;
-	tree_node* traverse_ptr = NULL;
+
+	stack<BST_node*> head_stack;
+	BST_node* traverse_ptr = NULL;
 	head_stack.push(this->head);
 	while ((traverse_ptr = head_stack.pop())) {
-		(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
+		(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
 		if (traverse_ptr->rchild != NULL) head_stack.push(traverse_ptr->rchild);
 		if (traverse_ptr->lchild != NULL) head_stack.push(traverse_ptr->lchild);
 	}
 }
 
-void tree::inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
+void BST::inorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
 	if (head == NULL) {
-		cout << "can not traverse. there is no tree_node." << endl;
+		cout << "can not traverse. there is no BST_node." << endl;
 		return;
 	}
-	stack<tree_node*> head_stack;
-	tree_node* traverse_ptr = NULL;
+
+	stack<BST_node*> head_stack;
+	BST_node* traverse_ptr = NULL;
 	head_stack.push(head);
 	bool new_left_spine = true;
 	while (!head_stack.is_empty()) {
@@ -55,7 +57,7 @@ void tree::inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tre
 			head_stack.push(head_stack.get_top()->lchild);
 		}
 		traverse_ptr = head_stack.pop();
-		(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
+		(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
 		if (traverse_ptr->rchild != NULL) {
 			new_left_spine = true;
 			head_stack.push(traverse_ptr->rchild);
@@ -64,13 +66,14 @@ void tree::inorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tre
 	}
 }
 
-void tree::postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), tree* optional_target_tree) {
+void BST::postorder_traverse(void (*to_do_while_traverse)(BST_node*, BST*), BST* optional_target_BST) {
 	if (head == NULL) {
-		cout << "can not traverse. there is no tree_node." << endl;
+		cout << "can not traverse. there is no BST_node." << endl;
 		return;
 	}
-	stack<tree_node*> head_stack;
-	tree_node* traverse_ptr = NULL;
+
+	stack<BST_node*> head_stack;
+	BST_node* traverse_ptr = NULL;
 	head_stack.push(head);
 	bool new_left_spine = true;
 	bool new_right_spine = true;
@@ -84,11 +87,11 @@ void tree::postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), t
 			head_stack.push(traverse_ptr->rchild);
 		}
 		else {
-			(*to_do_while_traverse)(traverse_ptr, optional_target_tree);
+			(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
 			new_left_spine = false;
-			tree_node* previous_tree_node = head_stack.pop();
-			tree_node* present_tree_node = head_stack.get_top();
-			if (present_tree_node && present_tree_node->rchild && present_tree_node->rchild == previous_tree_node) new_right_spine = false;
+			BST_node* previous_BST_node = head_stack.pop();
+			BST_node* present_BST_node = head_stack.get_top();
+			if (present_BST_node && present_BST_node->rchild && present_BST_node->rchild == previous_BST_node) new_right_spine = false;
 			else new_right_spine = true;
 		}
 	}
@@ -96,7 +99,7 @@ void tree::postorder_traverse(void (*to_do_while_traverse)(tree_node*, tree*), t
 
 
 
-tree_node* tree::remove_target(tree_node*& target_ptr) {
+BST_node* BST::remove_target(BST_node*& target_ptr) {
 	if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 		replace_with_inorder_successor(target_ptr);
 	}
@@ -113,9 +116,9 @@ tree_node* tree::remove_target(tree_node*& target_ptr) {
 	}
 }
 
-void tree::replace_with_inorder_predecessor(tree_node*& target_ptr) {
-	tree_node* previous_ptr = NULL;
-	tree_node* traverse_ptr = target_ptr->lchild;
+void BST::replace_with_inorder_predecessor(BST_node*& target_ptr) {
+	BST_node* previous_ptr = NULL;
+	BST_node* traverse_ptr = target_ptr->lchild;
 	while (traverse_ptr->rchild != NULL) {
 		previous_ptr = traverse_ptr;
 		traverse_ptr = traverse_ptr->rchild;
@@ -127,9 +130,9 @@ void tree::replace_with_inorder_predecessor(tree_node*& target_ptr) {
 	delete traverse_ptr;
 }
 
-void tree::replace_with_inorder_successor(tree_node*& target_ptr) {
-	tree_node* previous_ptr = NULL;
-	tree_node* traverse_ptr = target_ptr->rchild;
+void BST::replace_with_inorder_successor(BST_node*& target_ptr) {
+	BST_node* previous_ptr = NULL;
+	BST_node* traverse_ptr = target_ptr->rchild;
 	while (traverse_ptr->lchild != NULL) {
 		previous_ptr = traverse_ptr;
 		traverse_ptr = traverse_ptr->lchild;
