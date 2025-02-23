@@ -2,9 +2,9 @@
 #include "BST_using_recurse.h"
 using namespace std;
 
-void tree::replace_with_inorder_predecessor() {
-	tree* previous_ptr = NULL;
-	tree* traverse_ptr = lchild;
+void BST::replace_with_inorder_predecessor() {
+	BST* previous_ptr = NULL;
+	BST* traverse_ptr = lchild;
 	while (traverse_ptr->rchild != NULL) {
 		previous_ptr = traverse_ptr;
 		traverse_ptr = traverse_ptr->rchild;
@@ -17,9 +17,9 @@ void tree::replace_with_inorder_predecessor() {
 	if (previous_ptr != NULL) previous_ptr->rchild = NULL;
 }
 
-void tree::replace_with_inorder_successor() {
-	tree* previous_ptr = NULL;
-	tree* traverse_ptr = rchild;
+void BST::replace_with_inorder_successor() {
+	BST* previous_ptr = NULL;
+	BST* traverse_ptr = rchild;
 	while (traverse_ptr->lchild != NULL) {
 		previous_ptr = traverse_ptr;
 		traverse_ptr = traverse_ptr->lchild;
@@ -32,7 +32,7 @@ void tree::replace_with_inorder_successor() {
 	if (previous_ptr != NULL) previous_ptr->lchild = NULL;
 }
 
-void tree::remove_target(tree*& target_child_variable) {
+void BST::remove_target(BST*& target_child_variable) {
 	if (lchild != NULL && rchild != NULL) {								//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 		replace_with_inorder_successor();
 	}
@@ -49,13 +49,13 @@ void tree::remove_target(tree*& target_child_variable) {
 }
 
 
-int tree::get_data(int target_key) {
+int BST::retrieve(int target_key) {
 	if (target_key < key) {
-		if (lchild != NULL) return lchild->get_data(target_key);
+		if (lchild != NULL) return lchild->retrieve(target_key);
 		else  cout << "there is no such key in searching." << endl;
 	} 
 	else if (key < target_key) {
-		if (rchild != NULL) return rchild->get_data(target_key);
+		if (rchild != NULL) return rchild->retrieve(target_key);
 		else  cout << "there is no such key in searching." << endl;
 	}
 	else {
@@ -63,26 +63,21 @@ int tree::get_data(int target_key) {
 	}
 }
 
-void tree::insert(int new_key, int new_data) {
-	if (key == -1 && data == -1) cout << "inserting.... " << endl;
-
+void BST::insert(int new_key, int new_data) {
 	if (new_key < key) {
-		if(lchild == NULL) lchild = new tree(new_key, new_data);
+		if(lchild == NULL) lchild = new BST(new_key, new_data);
 		else lchild->insert(new_key, new_data);
 	}
 	else if(key < new_key) {
-		if (rchild == NULL) rchild = new tree(new_key, new_data);
+		if (rchild == NULL) rchild = new BST(new_key, new_data);
 		else rchild->insert(new_key, new_data);
 	}
 	else {
-		cout << "cannot insert! key is same!" << endl;
-		return;
+		if (key != -1 || data != -1) cout << "cannot insert! key is same! If it is dummy_room_node, then it is okay" << endl;
 	}
 }
 
-void tree::remove(int target_key) {	
-	if (key == -1 && data == -1) cout << "removing.... " << endl;
-
+void BST::remove(int target_key) {	
 	if (target_key < key) {
 		if (lchild->key == target_key) {
 			lchild->remove_target(lchild);

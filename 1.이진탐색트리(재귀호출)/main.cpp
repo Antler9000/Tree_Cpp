@@ -1,35 +1,35 @@
 #include "BST_using_recurse.h"
 
 int main() {
-	tree& test_tree = *(new tree());
-	test_tree.insert(5, 1515);
-	test_tree.insert(7, 2727);
-	test_tree.insert(3, 1313);
-	test_tree.insert(4, 2424);
-	test_tree.insert(6, 3636);
-	test_tree.preorder_print();
+	BST& test_BST = *(new BST());
+	test_BST.insert(5, 1515);
+	test_BST.insert(7, 2727);
+	test_BST.insert(3, 1313);
+	test_BST.insert(4, 2424);
+	test_BST.insert(6, 3636);
+	test_BST.preorder_print();
 
-	tree& copied_tree = *(new tree());
-	copied_tree.copy_from(&test_tree);
-	copied_tree.preorder_print();
+	BST& copied_BST = *(new BST());
+	copied_BST.copy_from(&test_BST);
+	copied_BST.preorder_print();
 
-	test_tree.remove(7);
-	test_tree.preorder_print();
+	test_BST.remove(7);
+	test_BST.preorder_print();
 
-	test_tree.remove(5);
-	test_tree.preorder_print();
+	test_BST.remove(5);
+	test_BST.preorder_print();
 
-	test_tree.remove(6);
-	test_tree.preorder_print();
+	test_BST.remove(6);
+	test_BST.preorder_print();
 
-	test_tree.remove(4);
-	test_tree.preorder_print();
+	test_BST.remove(4);
+	test_BST.preorder_print();
 
-	test_tree.remove(3);
-	test_tree.preorder_print();
+	test_BST.remove(3);
+	test_BST.preorder_print();
 
-	test_tree.remove_all();
-	test_tree.preorder_print();
+	test_BST.remove_all();
+	test_BST.preorder_print();
 
 	return 0;
 }
