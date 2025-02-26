@@ -3,10 +3,16 @@
 
 #include "../2.이진탐색트리(반복문)/BST_using_while.h"
 
-class splay_tree : public tree {
+class splay_tree : public BST {
+
+	void LL_rotation();
+	void RR_rotation();
+
 public :
-	splay_tree() : tree() {
+	splay_tree() : BST() {
 	}
+
+	int retrieve(int target_key);
 };
 
 #endif //SPLAY_TREE_H

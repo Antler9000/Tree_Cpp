@@ -11,6 +11,11 @@ int main() {
 	test_tree.insert(8, 5858);
 	test_tree.preorder_print();
 
+	cout << "retrieve test" << endl;
+	cout << test_tree.retrieve(5) << endl;
+	cout << test_tree.retrieve(7) << endl;
+	cout << test_tree.retrieve(8) << endl;
+
 	splay_tree& copied_test_tree = *(new splay_tree());
 	copied_test_tree.copy_from(&test_tree);
 	copied_test_tree.preorder_print();
