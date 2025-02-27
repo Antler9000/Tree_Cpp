@@ -11,10 +11,30 @@ int main() {
 	test_tree.insert(8, 5858);
 	test_tree.preorder_print();
 
-	cout << "retrieve test" << endl;
-	cout << test_tree.retrieve(5) << endl;
-	cout << test_tree.retrieve(7) << endl;
-	cout << test_tree.retrieve(8) << endl;
+	cout << "retrieve test 8" << endl;
+	test_tree.retrieve(8);
+	test_tree.preorder_print();
+
+	cout << "retrieve test 4" << endl;
+	test_tree.retrieve(4);
+	test_tree.preorder_print();
+
+	cout << "retrieve test 3" << endl;
+	test_tree.retrieve(3);
+	test_tree.preorder_print();
+
+	cout << "retrieve test 3" << endl;
+	test_tree.retrieve(3);
+	test_tree.preorder_print();
+
+	cout << "retrieve test 7" << endl;
+	test_tree.retrieve(7);
+	test_tree.preorder_print();
+
+	cout << "retrieve test 5" << endl;
+	test_tree.retrieve(5);
+	test_tree.preorder_print();
+
 
 	splay_tree& copied_test_tree = *(new splay_tree());
 	copied_test_tree.copy_from(&test_tree);
