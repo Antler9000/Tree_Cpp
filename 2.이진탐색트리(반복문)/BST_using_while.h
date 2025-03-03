@@ -8,7 +8,6 @@ class BST;
 
 class BST_node {
 	friend class BST<BST_node>;
-	friend class splay_tree;
 	int key;
 	int data;
 	BST_node* lchild;
@@ -22,7 +21,7 @@ class BST_node {
 	}
 };
 
-template <class T>
+template <class T = BST_node>
 class BST {
 protected :
 	T* head;
