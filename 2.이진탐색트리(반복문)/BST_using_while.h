@@ -4,10 +4,11 @@
 #include "stack.h"
 
 template <class T>
-class BST;
+class BST_template;
+
 
 class BST_node {
-	friend class BST<BST_node>;
+	friend class BST_template<BST_node>;
 	int key;
 	int data;
 	BST_node* lchild;
@@ -21,8 +22,12 @@ class BST_node {
 	}
 };
 
+
+//이진 탐색 트리를 상속받아 더 특수화된 트리(eg. splay_tree 등)를 만들 때 내부 노드 클래스를 변경하기 쉽도록, 사용할 내부 노드 클래스를 템플릿 인자로 정의하였다.
+//따라서, 이진 탐색 트리에서 더 특수화된 트리을 정의하고 싶다면, BST_template에 자신이 정의한 새 노드 클래스를 인자로 준 것을 그것을 상속받으면 된다. (eg. class splay_tree : public BST_template<splay_node> {};)
+//또한 우리가 일반적으로 사용할 이진 탐색 트리도 이 템플릿에 BST_node를 인자로 준 특수화된 경우로 class BST를 이 다음 클래스로 정의해놓았으니 그것을 사용하면 된다.
 template <class T = BST_node>
-class BST {
+class BST_template {
 protected :
 	T* head;
 
@@ -30,7 +35,7 @@ private :
 	//"to_do_with_target_ptr" 메소드 포인터는 특정 target_key를 가진 노드를 가리키는 자식 포인터에 수행할 작업이나,
 	//특정 target_key 노드가 삽입될 수 있는 NULL 자식 포인터에 수행할 작업을 넘겨주는 인터페이스임.
 	//응용되는 삽입-검색-삭제에서는 부모가 자식을 가리키는 포인터 변수를 직접 수정할 수 있어야 하기에, 메소드 포인터는 레퍼런스 인자를 가짐
-	T* search(int target_key, T* (BST::* to_do_with_target_ptr)(T*&)) {
+	T* search(int target_key, T* (BST_template::* to_do_with_target_ptr)(T*&)) {
 		if (head == NULL) return (this->*to_do_with_target_ptr)(head);
 		else if (target_key == head->key) return (this->*to_do_with_target_ptr)(head);
 
@@ -103,7 +108,7 @@ private :
 
 	//"to_do_while_traverse" 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
 	//"optional_target_BST" BST 포인터는 앞선 "to_do_while_traverse" 작업에서 대상 BST 포인터가 필요한 경우를 위한 인수임.
-	void preorder_traverse(void (*to_do_while_traverse)(T*, BST*), BST* optional_target_BST) {
+	void preorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
 		stack<T*> head_stack;
@@ -116,7 +121,7 @@ private :
 		}
 	}
 
-	void inorder_traverse(void (*to_do_while_traverse)(T*, BST*), BST* optional_target_BST) {
+	void inorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
 		stack<T*> head_stack;
@@ -136,7 +141,7 @@ private :
 		}
 	}
 
-	void postorder_traverse(void (*to_do_while_traverse)(T*, BST*), BST* optional_target_BST) {
+	void postorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
 		stack<T*> head_stack;
@@ -162,11 +167,11 @@ private :
 		}
 	}
 
-	static void print_node(T* target_node, BST* dummy_argument) {
+	static void print_node(T* target_node, BST_template* dummy_argument) {
 		cout << "node key : " << target_node->key << " / node data : " << target_node->data << endl;
 	}
 
-	static void remove_childs(T* target_node, BST* dummy_argument) {
+	static void remove_childs(T* target_node, BST_template* dummy_argument) {
 		if (target_node->lchild != NULL) {
 			delete target_node->lchild;
 			target_node->lchild = NULL;
@@ -177,67 +182,70 @@ private :
 		}
 	}
 
-	static void copy_node(T* source_node, BST* dest_BST) {
+	static void copy_node(T* source_node, BST_template* dest_BST) {
 		dest_BST->insert(source_node->key, source_node->data);
 	}
 
 
 public:
-	BST() {
+	BST_template() {
 		cout << "BST is being made!" << endl;
 		head = NULL;
 	}
 
-	~BST() {
+	~BST_template() {
 		cout << "BST is being removed" << endl;
 		remove_all();
 	}
 
-	//삽입
 	void insert(int new_key, int new_data) {
-		T* made_child = search(new_key, &BST::set_dummy_child);
+		T* made_child = search(new_key, &BST_template::set_dummy_child);
 		made_child->key = new_key;
 		made_child->data = new_data;
 	}
 
-	//검색
 	int retrieve(int target_key) {
-		return search(target_key, &BST::get_T)->data;
+		return search(target_key, &BST_template::get_T)->data;
 	}
 
-	//삭제
 	void remove(int target_key) {
-		search(target_key, &BST::remove_target);
+		search(target_key, &BST_template::remove_target);
 	}
 
-	void copy_from(BST* target_BST) {
-		target_BST->preorder_traverse(&BST::copy_node, this);
+	void copy_from(BST_template* target_BST) {
+		target_BST->preorder_traverse(&BST_template::copy_node, this);
 	}
 
 	void remove_all() {
 		cout << "remove all" << endl;
-		postorder_traverse(&BST::remove_childs, NULL);
+		postorder_traverse(&BST_template::remove_childs, NULL);
 		delete head;
 		head = NULL;
 	}
 
 	void preorder_print() {
 		cout << "preorder traverse start" << endl;
-		preorder_traverse(&BST::print_node, NULL);
+		preorder_traverse(&BST_template::print_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
 
 	void inorder_print() {
 		cout << "inorder traverse start" << endl;
-		inorder_traverse(&BST::print_node, NULL);
+		inorder_traverse(&BST_template::print_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
 
 	void postorder_print() {
 		cout << "postorder traverse start" << endl;
-		postorder_traverse(&BST::print_node, NULL);
+		postorder_traverse(&BST_template::print_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
+};
+
+
+class BST : public BST_template<BST_node> {
+public:
+	BST() : BST_template() {}
 };
 
 #endif //BST_USING_WHILE_H
