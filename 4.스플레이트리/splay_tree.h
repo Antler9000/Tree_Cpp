@@ -5,7 +5,7 @@
 
 class splay_node {
 	friend class splay_tree;
-	friend class BST<splay_node>;
+	friend class BST_template<splay_node>;
 	int key;
 	int data;
 	splay_node* lchild;
@@ -19,7 +19,7 @@ class splay_node {
 	}
 };
 
-class splay_tree : public BST<splay_node> {
+class splay_tree : public BST_template<splay_node> {
 	void splay_target(splay_node* greatgrandfather_of_traverse_ptr, splay_node* grandfather_of_target, splay_node* father_of_target, splay_node* target);
 
 	//ZIG의 경우에는 부모까지 변화가 일어나는 경우이므로, 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였다.
@@ -85,7 +85,7 @@ class splay_tree : public BST<splay_node> {
 
 
 public :
-	splay_tree() : BST() {}
+	splay_tree() : BST_template() {}
 
 	int retrieve(int target_key);
 };
