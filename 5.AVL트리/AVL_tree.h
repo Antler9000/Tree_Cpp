@@ -3,75 +3,82 @@
 
 #include "../2.이진탐색트리(반복문)/BST_using_while.h"
 
-class AVL_tree : public BST {
-	void splay_target(BST_node* greatgrandfather_of_traverse_ptr, BST_node* grandfather_of_target, BST_node* father_of_target, BST_node* target);
+class AVL_node {
+	friend class BST_template<AVL_node>;
+	friend class AVL_tree;
+	int key;
+	int data;
+	int height_from_leaf;
+	AVL_node* lchild;
+	AVL_node* rchild;
 
-	//ZIG의 경우에는 부모까지 변화가 일어나는 경우이므로, 부모를 가르키는 조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였다.
-	//ZIG_ZIG나 ZIG_ZAG와 같이 조부까지 변화가 일어나는 경우를 위해, 조부를 가리키는 증조부의 자식 포인터를 직접 수정할 수 있도록 레퍼런스 인자를 사용하였다.
-	void L_ZIG(BST_node*& father_of_target, BST_node* target) {
-		cout << "L_ZIG" << endl;
-		father_of_target->lchild = target->rchild;
-		target->rchild = father_of_target;
-		father_of_target = target;
+	AVL_node(int key, int data) {
+		this->key = key;
+		this->data = data;
+		this->height_from_leaf = 0;
+		this->lchild = NULL;
+		this->rchild = NULL;
 	}
+};
 
-	void R_ZIG(BST_node*& father_of_target, BST_node* target) {
-		cout << "R_ZIG" << endl;
-		father_of_target->rchild = target->lchild;
-		target->lchild = father_of_target;
-		father_of_target = target;
-	}
-
-	void LL_ZIG_ZIG(BST_node*& grandfather_of_target, BST_node* father_of_target, BST_node* target) {
-		cout << "LL_ZIG_ZIG" << endl;
-		grandfather_of_target->lchild = father_of_target->rchild;
-		father_of_target->rchild = grandfather_of_target;
-		grandfather_of_target = father_of_target;
-
-		father_of_target->lchild = target->rchild;
-		target->rchild = father_of_target;
-		grandfather_of_target = target;
-	}
-
-	void LR_ZIG_ZAG(BST_node*& grandfather_of_target, BST_node* father_of_target, BST_node* target) {
-		cout << "LR_ZIG_ZAG" << endl;
-		cout << grandfather_of_target->key << " " << father_of_target->key << " " << target->key << endl;
-		grandfather_of_target->lchild = target;
-		father_of_target->rchild = target->lchild;
-		target->lchild = father_of_target;
-
-		grandfather_of_target->lchild = target->rchild;
-		target->rchild = grandfather_of_target;
-		grandfather_of_target = target;
-	}
-
-	void RL_ZIG_ZAG(BST_node*& grandfather_of_target, BST_node* father_of_target, BST_node* target) {
-		cout << "RL_ZIG_ZAG" << endl;
-		grandfather_of_target->rchild = target;
-		father_of_target->lchild = target->rchild;
-		target->rchild = father_of_target;
-
-		grandfather_of_target->rchild = target->lchild;
-		target->lchild = grandfather_of_target;
-		grandfather_of_target = target;
-	}
-
-	void RR_ZIG_ZIG(BST_node*& grandfather_of_target, BST_node* father_of_target, BST_node* target) {
-		cout << "RR_ZIG_ZIG" << endl;
-		grandfather_of_target->rchild = father_of_target->lchild;
-		father_of_target->lchild = grandfather_of_target;
-		grandfather_of_target = father_of_target;
-
-		father_of_target->rchild = target->lchild;
-		target->lchild = father_of_target;
-		grandfather_of_target = target;
-	}
-
-
+class AVL_tree : public BST_template<AVL_node> {
 public :
-	AVL_tree() : BST() {}
+	AVL_tree() : BST_template() {}
 
-	int retrieve(int target_key);
+	void insert(int new_key, int new_data) {
+		if (head == NULL) {
+			head = new AVL_node(new_key, new_data);
+			return;
+		}
+
+		AVL_node* traverse_ptr = head;
+		while (true) {
+			if (new_key < traverse_ptr->key) {
+				if(traverse_ptr->lchild == NULL){
+					traverse_ptr->lchild = new AVL_node(new_key, new_data);
+					return;
+				}
+				else traverse_ptr = traverse_ptr->lchild;
+			}
+			else {
+				if (traverse_ptr->rchild == NULL) {
+					traverse_ptr->rchild = new AVL_node(new_key, new_data);
+					return;
+				}
+				else traverse_ptr = traverse_ptr->rchild;
+			}
+		}
+	}
+
+	void remove(int target_key) {
+		if (head == NULL) {
+			cout << "Cannot remove! tree is emptied" << endl;
+			return;
+		}
+
+		if (head->key == target_key) {
+			BST_template<AVL_node>::remove_target(head);
+			return;
+		}
+
+		AVL_node* traverse_ptr = head;
+		while (true) {
+			if (target_key < traverse_ptr->key) {
+				if (traverse_ptr->lchild->key == target_key) {
+					BST_template<AVL_node>::remove_target(traverse_ptr->lchild);
+					return;
+				}
+				else traverse_ptr = traverse_ptr->lchild;
+			}
+			else {
+				if (traverse_ptr->rchild->key == target_key) {
+					BST_template<AVL_node>::remove_target(traverse_ptr->rchild);
+					return;
+				}
+				else traverse_ptr = traverse_ptr->rchild;
+			}
+		}
+	}
 };
 
 #endif //AVL_TREE_H
