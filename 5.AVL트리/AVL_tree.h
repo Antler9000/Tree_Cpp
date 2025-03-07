@@ -23,41 +23,93 @@ class AVL_node {
 
 class AVL_tree : public BST_template<AVL_node> {
 protected :
-	void balancing_target_node(AVL_node* target_node) {
+	int max(int a, int b) { 
+		return (a>b) ? a : b; 
+	}
+
+	void update_height(AVL_node* target_node) {
+		int height_from_lchild = 0;
+		int height_from_rchild = 0;
+		if (target_node->lchild != NULL) height_from_lchild = 1 + target_node->lchild->height_from_leaf;
+		if (target_node->rchild != NULL) height_from_rchild = 1 + target_node->rchild->height_from_leaf;
+		target_node->height_from_leaf = max(height_from_lchild, height_from_rchild);
+	}
+
+	void LL_rotation(AVL_node* target_node, AVL_node* parent_node) {
+		cout << "LL 회전" << endl;			
+		if (parent_node->lchild == target_node) {
+			parent_node->lchild = target_node->lchild;
+			target_node->lchild = target_node->lchild->rchild;
+			parent_node->lchild->rchild = target_node;
+		}
+		else {
+			parent_node->rchild = target_node->lchild;
+			target_node->lchild = target_node->lchild->rchild;
+			parent_node->rchild->rchild = target_node;
+		}
+		parent_node->lchild->height_from_leaf = target_node->height_from_leaf - 1;
+		update_height(target_node);
+	}
+
+	void LR_rotation(AVL_node* target_node, AVL_node* parent_node) {
+		cout << "LR 회전" << endl;
+	}
+
+	void RL_rotation(AVL_node* target_node, AVL_node* parent_node) {
+		cout << "RL 회전" << endl;
+	}
+
+	void RR_rotation(AVL_node* target_node, AVL_node* parent_node) {
+		cout << "RR 회전" << endl;
+		if (parent_node->lchild == target_node) {
+			parent_node->lchild = target_node->rchild;
+			target_node->rchild = target_node->rchild->lchild;
+			parent_node->lchild->lchild = target_node;
+		}
+		else {
+			parent_node->rchild = target_node->rchild;
+			target_node->rchild = target_node->rchild->lchild;
+			parent_node->rchild->lchild = target_node;
+		}
+		parent_node->rchild->height_from_leaf = target_node->height_from_leaf - 1;
+		update_height(target_node);
+	}
+
+	void balancing_target_node(AVL_node* target_node, AVL_node* parent_node) {
 		int left_height = 0;
 		int right_height = 0;
-		if (target_node->lchild != NULL) left_height = target_node->lchild->height_from_leaf;
-		if (target_node->rchild != NULL) right_height = target_node->rchild->height_from_leaf;
+		if (target_node->lchild != NULL) left_height = 1 + target_node->lchild->height_from_leaf;
+		if (target_node->rchild != NULL) right_height = 1 + target_node->rchild->height_from_leaf;
 
 		if (left_height - right_height >= 2) {
 			if (target_node->lchild->rchild == NULL) {
-				cout << "LL 회전" << endl;
+				LL_rotation(target_node, parent_node);
 			}
 			else if (target_node->lchild->lchild == NULL) {
-				cout << "LR 회전" << endl;
+				LR_rotation(target_node, parent_node);
 			}
 			else {
 				if (target_node->lchild->lchild->height_from_leaf > target_node->lchild->rchild->height_from_leaf) {
-					cout << "LL 회전" << endl;
+					LL_rotation(target_node, parent_node);
 				}
 				else {
-					cout << "LR 회전" << endl;
+					LR_rotation(target_node, parent_node);
 				}
 			}
 		}
 		else if (right_height - left_height >= 2) {
 			if (target_node->rchild->rchild == NULL) {
-				cout << "RL 회전" << endl;
+				RL_rotation(target_node, parent_node);
 			}
 			else if (target_node->rchild->lchild == NULL) {
-				cout << "RR 회전" << endl;
+				RR_rotation(target_node, parent_node);
 			}
 			else {
 				if (target_node->rchild->lchild->height_from_leaf > target_node->rchild->rchild->height_from_leaf) {
-					cout << "RL 회전" << endl;
+					RL_rotation(target_node, parent_node);
 				}
 				else {
-					cout << "RR 회전" << endl;
+					RR_rotation(target_node, parent_node);
 				}
 			}
 		}
@@ -65,8 +117,11 @@ protected :
 
 	void balancing_all_target_to_root(stack<AVL_node*>* ancester_node_stack) {
 		while (ancester_node_stack->is_empty() == false) {
-			AVL_node* reverse_traverse_node = ancester_node_stack->pop();
-			balancing_target_node(reverse_traverse_node);
+			AVL_node* retraverse_node = ancester_node_stack->pop();
+			AVL_node* parent_of_retraverse_node = ancester_node_stack->get_top();
+			update_height(retraverse_node);
+			cout << "node's height : " << retraverse_node->height_from_leaf << endl;	//debug
+			balancing_target_node(retraverse_node, parent_of_retraverse_node);
 		}
 	}
 
@@ -74,6 +129,7 @@ public :
 	AVL_tree() : BST_template() {}
 
 	void insert(int new_key, int new_data) {
+		cout << endl << "inserting key : " << new_key << endl;					//debug
 		if (head == NULL) {
 			head = new AVL_node(new_key, new_data);
 			return;
