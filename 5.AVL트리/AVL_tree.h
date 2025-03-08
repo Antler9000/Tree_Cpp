@@ -37,41 +37,72 @@ protected :
 
 	void LL_rotation(AVL_node* target_node, AVL_node* parent_node) {
 		cout << "LL 회전" << endl;			
-		if (parent_node->lchild == target_node) {
+		if (parent_node == NULL) {
+			head = target_node->lchild;
+			target_node->lchild = target_node->lchild->rchild;
+			head->rchild = target_node;
+			head->height_from_leaf = target_node->height_from_leaf - 1;
+		}
+		else if (parent_node->lchild == target_node) {
 			parent_node->lchild = target_node->lchild;
 			target_node->lchild = target_node->lchild->rchild;
 			parent_node->lchild->rchild = target_node;
+			parent_node->lchild->height_from_leaf = target_node->height_from_leaf - 1;
 		}
 		else {
 			parent_node->rchild = target_node->lchild;
 			target_node->lchild = target_node->lchild->rchild;
 			parent_node->rchild->rchild = target_node;
+			parent_node->rchild->height_from_leaf = target_node->height_from_leaf - 1;
 		}
-		parent_node->lchild->height_from_leaf = target_node->height_from_leaf - 1;
+
 		update_height(target_node);
 	}
 
 	void LR_rotation(AVL_node* target_node, AVL_node* parent_node) {
 		cout << "LR 회전" << endl;
+		AVL_node* LR_location = target_node->lchild->rchild;
+		target_node->lchild->rchild = LR_location->lchild;
+		LR_location->lchild = target_node->lchild;
+		target_node->lchild = LR_location;
+		update_height(LR_location->lchild);
+		update_height(LR_location);
+		update_height(target_node);
+		LL_rotation(target_node, parent_node);
 	}
 
 	void RL_rotation(AVL_node* target_node, AVL_node* parent_node) {
 		cout << "RL 회전" << endl;
+		AVL_node* RL_location = target_node->rchild->lchild;
+		target_node->rchild->lchild = RL_location->rchild;
+		RL_location->rchild = target_node->rchild;
+		target_node->rchild = RL_location;
+		update_height(RL_location->rchild);
+		update_height(RL_location);
+		update_height(target_node);
+		RR_rotation(target_node, parent_node);
 	}
 
 	void RR_rotation(AVL_node* target_node, AVL_node* parent_node) {
 		cout << "RR 회전" << endl;
-		if (parent_node->lchild == target_node) {
+		if (parent_node == NULL) {
+			head = target_node->rchild;
+			target_node->rchild = target_node->rchild->lchild;
+			head->lchild = target_node;
+			head->height_from_leaf = target_node->height_from_leaf - 1;
+		}
+		else if (parent_node->lchild == target_node) {
 			parent_node->lchild = target_node->rchild;
 			target_node->rchild = target_node->rchild->lchild;
 			parent_node->lchild->lchild = target_node;
+			parent_node->lchild->height_from_leaf = target_node->height_from_leaf - 1;
 		}
 		else {
 			parent_node->rchild = target_node->rchild;
 			target_node->rchild = target_node->rchild->lchild;
 			parent_node->rchild->lchild = target_node;
+			parent_node->rchild->height_from_leaf = target_node->height_from_leaf - 1;
 		}
-		parent_node->rchild->height_from_leaf = target_node->height_from_leaf - 1;
 		update_height(target_node);
 	}
 
