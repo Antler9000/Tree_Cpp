@@ -23,20 +23,107 @@ class AVL_node {
 
 class AVL_tree : public BST_template<AVL_node> {
 protected :
-	int max(int a, int b) { 
-		return (a>b) ? a : b; 
+	void remove_target(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack) {
+		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+			replace_with_inorder_successor(target_ptr, ancester_node_stack);
+		}
+		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
+			replace_with_inorder_successor(target_ptr, ancester_node_stack);
+		}
+		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
+			replace_with_inorder_predecessor(target_ptr, ancester_node_stack);
+		}
+		else {
+			delete target_ptr;
+			target_ptr = NULL;
+		}
+		balancing_all_target_to_root(ancester_node_stack);
 	}
 
-	void update_height(AVL_node* target_node) {
-		int height_from_lchild = 0;
-		int height_from_rchild = 0;
-		if (target_node->lchild != NULL) height_from_lchild = 1 + target_node->lchild->height_from_leaf;
-		if (target_node->rchild != NULL) height_from_rchild = 1 + target_node->rchild->height_from_leaf;
-		target_node->height_from_leaf = max(height_from_lchild, height_from_rchild);
+	void replace_with_inorder_predecessor(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack) {
+		AVL_node* previous_ptr = NULL;
+		AVL_node* traverse_ptr = target_ptr->lchild;
+		ancester_node_stack->push(target_ptr);
+		while (traverse_ptr->rchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->rchild;
+			ancester_node_stack->push(previous_ptr);
+		}
+		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;
+		else target_ptr->lchild = traverse_ptr->lchild;
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
+	}
+
+	void replace_with_inorder_successor(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack) {
+		AVL_node* previous_ptr = NULL;
+		AVL_node* traverse_ptr = target_ptr->rchild;
+		ancester_node_stack->push(target_ptr);
+		while (traverse_ptr->lchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->lchild;
+			ancester_node_stack->push(previous_ptr);
+		}
+		if (previous_ptr != NULL) previous_ptr->lchild = traverse_ptr->rchild;
+		else target_ptr->rchild = traverse_ptr->rchild;
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
+	}
+
+	void balancing_all_target_to_root(stack<AVL_node*>* ancester_node_stack) {
+		while (ancester_node_stack->is_empty() == false) {
+			AVL_node* retraverse_node = ancester_node_stack->pop();
+			AVL_node* parent_of_retraverse_node = ancester_node_stack->get_top();
+			update_height(retraverse_node);
+			cout << "node's height : " << retraverse_node->height_from_leaf << endl;	//debug
+			balancing_target_node(retraverse_node, parent_of_retraverse_node);
+		}
+	}
+
+	void balancing_target_node(AVL_node* target_node, AVL_node* parent_node) {
+		int left_height = 0;
+		int right_height = 0;
+		if (target_node->lchild != NULL) left_height = 1 + target_node->lchild->height_from_leaf;
+		if (target_node->rchild != NULL) right_height = 1 + target_node->rchild->height_from_leaf;
+
+		if (left_height - right_height >= 2) {
+			if (target_node->lchild->rchild == NULL) {
+				LL_rotation(target_node, parent_node);
+			}
+			else if (target_node->lchild->lchild == NULL) {
+				LR_rotation(target_node, parent_node);
+			}
+			else {
+				if (target_node->lchild->lchild->height_from_leaf > target_node->lchild->rchild->height_from_leaf) {
+					LL_rotation(target_node, parent_node);
+				}
+				else {
+					LR_rotation(target_node, parent_node);
+				}
+			}
+		}
+		else if (right_height - left_height >= 2) {
+			if (target_node->rchild->rchild == NULL) {
+				RL_rotation(target_node, parent_node);
+			}
+			else if (target_node->rchild->lchild == NULL) {
+				RR_rotation(target_node, parent_node);
+			}
+			else {
+				if (target_node->rchild->lchild->height_from_leaf > target_node->rchild->rchild->height_from_leaf) {
+					RL_rotation(target_node, parent_node);
+				}
+				else {
+					RR_rotation(target_node, parent_node);
+				}
+			}
+		}
 	}
 
 	void LL_rotation(AVL_node* target_node, AVL_node* parent_node) {
-		cout << "LL 회전" << endl;			
+		cout << "LL 회전" << endl;
 		if (parent_node == NULL) {
 			head = target_node->lchild;
 			target_node->lchild = target_node->lchild->rchild;
@@ -106,61 +193,22 @@ protected :
 		update_height(target_node);
 	}
 
-	void balancing_target_node(AVL_node* target_node, AVL_node* parent_node) {
-		int left_height = 0;
-		int right_height = 0;
-		if (target_node->lchild != NULL) left_height = 1 + target_node->lchild->height_from_leaf;
-		if (target_node->rchild != NULL) right_height = 1 + target_node->rchild->height_from_leaf;
-
-		if (left_height - right_height >= 2) {
-			if (target_node->lchild->rchild == NULL) {
-				LL_rotation(target_node, parent_node);
-			}
-			else if (target_node->lchild->lchild == NULL) {
-				LR_rotation(target_node, parent_node);
-			}
-			else {
-				if (target_node->lchild->lchild->height_from_leaf > target_node->lchild->rchild->height_from_leaf) {
-					LL_rotation(target_node, parent_node);
-				}
-				else {
-					LR_rotation(target_node, parent_node);
-				}
-			}
-		}
-		else if (right_height - left_height >= 2) {
-			if (target_node->rchild->rchild == NULL) {
-				RL_rotation(target_node, parent_node);
-			}
-			else if (target_node->rchild->lchild == NULL) {
-				RR_rotation(target_node, parent_node);
-			}
-			else {
-				if (target_node->rchild->lchild->height_from_leaf > target_node->rchild->rchild->height_from_leaf) {
-					RL_rotation(target_node, parent_node);
-				}
-				else {
-					RR_rotation(target_node, parent_node);
-				}
-			}
-		}
+	void update_height(AVL_node* target_node) {
+		int height_from_lchild = 0;
+		int height_from_rchild = 0;
+		if (target_node->lchild != NULL) height_from_lchild = 1 + target_node->lchild->height_from_leaf;
+		if (target_node->rchild != NULL) height_from_rchild = 1 + target_node->rchild->height_from_leaf;
+		target_node->height_from_leaf = max(height_from_lchild, height_from_rchild);
 	}
 
-	void balancing_all_target_to_root(stack<AVL_node*>* ancester_node_stack) {
-		while (ancester_node_stack->is_empty() == false) {
-			AVL_node* retraverse_node = ancester_node_stack->pop();
-			AVL_node* parent_of_retraverse_node = ancester_node_stack->get_top();
-			update_height(retraverse_node);
-			cout << "node's height : " << retraverse_node->height_from_leaf << endl;	//debug
-			balancing_target_node(retraverse_node, parent_of_retraverse_node);
-		}
+	int max(int a, int b) {
+		return (a > b) ? a : b;
 	}
 
 public :
 	AVL_tree() : BST_template() {}
 
 	void insert(int new_key, int new_data) {
-		cout << endl << "inserting key : " << new_key << endl;					//debug
 		if (head == NULL) {
 			head = new AVL_node(new_key, new_data);
 			return;
@@ -202,23 +250,27 @@ public :
 			return;
 		}
 
+		stack<AVL_node*> ancester_node_stack;
+
 		if (head->key == target_key) {
-			BST_template<AVL_node>::remove_target(head);
+			remove_target(head, &ancester_node_stack);
 			return;
 		}
 
 		AVL_node* traverse_ptr = head;
 		while (true) {
 			if (target_key < traverse_ptr->key) {
+				ancester_node_stack.push(traverse_ptr);
 				if (traverse_ptr->lchild->key == target_key) {
-					BST_template<AVL_node>::remove_target(traverse_ptr->lchild);
+					remove_target(traverse_ptr->lchild, &ancester_node_stack);
 					return;
 				}
 				else traverse_ptr = traverse_ptr->lchild;
 			}
 			else {
+				ancester_node_stack.push(traverse_ptr);
 				if (traverse_ptr->rchild->key == target_key) {
-					BST_template<AVL_node>::remove_target(traverse_ptr->rchild);
+					remove_target(traverse_ptr->rchild, &ancester_node_stack);
 					return;
 				}
 				else traverse_ptr = traverse_ptr->rchild;
