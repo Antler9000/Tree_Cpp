@@ -5,39 +5,39 @@
 using namespace std;
 
 template <class T>
-class stack;
+class Stack;
 
 template <class T>
-class stack_node {
-	friend class stack<T>;
+class StackNode {
+	friend class Stack<T>;
 	T data;
-	stack_node* child;
+	StackNode* child;
 
-	stack_node(T data) {
+	StackNode(T data) {
 		this->data = data;
 		this->child = NULL;
 	}
 };
 
 template <class T>
-class stack {
-	stack_node<T>* head;
+class Stack {
+	StackNode<T>* head;
 
 public:
-	stack() {
+	Stack() {
 		head = NULL;
 	}
 
 	void push(T data) {
 		if (head == NULL) {
-			head = new stack_node<T>(data);
+			head = new StackNode<T>(data);
 		}
 		else {
-			stack_node<T>* traverse_ptr = head;
+			StackNode<T>* traverse_ptr = head;
 			while (traverse_ptr->child) {
 				traverse_ptr = traverse_ptr->child;
 			}
-			traverse_ptr->child = new stack_node<T>(data);
+			traverse_ptr->child = new StackNode<T>(data);
 		}
 	}
 
@@ -53,7 +53,7 @@ public:
 			return temp;
 		}
 		else {
-			stack_node<T>* traverse_ptr = head;
+			StackNode<T>* traverse_ptr = head;
 			while (traverse_ptr->child->child != NULL) {
 				traverse_ptr = traverse_ptr->child;
 			}
@@ -73,7 +73,7 @@ public:
 			return head->data;
 		}
 		else {
-			stack_node<T>* traverse_ptr = head;
+			StackNode<T>* traverse_ptr = head;
 			while (traverse_ptr->child->child) {
 				traverse_ptr = traverse_ptr->child;
 			}

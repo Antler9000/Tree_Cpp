@@ -26,19 +26,19 @@ class BST_node {
 //이진 탐색 트리를 상속받아 더 특수화된 트리(eg. splay_tree 등)를 만들 때 내부 노드 클래스를 변경하기 쉽도록, 사용할 내부 노드 클래스를 템플릿 인자로 정의하였다.
 //따라서, 이진 탐색 트리에서 더 특수화된 트리을 정의하고 싶다면, BST_template에 자신이 정의한 새 노드 클래스를 인자로 준 것을 그것을 상속받으면 된다. (eg. class splay_tree : public BST_template<splay_node> {};)
 //또한 우리가 일반적으로 사용할 이진 탐색 트리도 이 템플릿에 BST_node를 인자로 준 특수화된 경우로 class BST를 이 다음 클래스로 정의해놓았으니 그것을 사용하면 된다.
-template <class T = BST_node>
+template <class NodeType = BST_node>
 class BST_template {
 protected :
-	T* head;
+	NodeType* head;
 
 	//"to_do_with_target_ptr" 메소드 포인터는 특정 target_key를 가진 노드를 가리키는 자식 포인터에 수행할 작업이나,
 	//특정 target_key 노드가 삽입될 수 있는 NULL 자식 포인터에 수행할 작업을 넘겨주는 인터페이스임.
 	//응용되는 삽입-검색-삭제에서는 부모가 자식을 가리키는 포인터 변수를 직접 수정할 수 있어야 하기에, 메소드 포인터는 레퍼런스 인자를 가짐
-	T* search(int target_key, T* (BST_template::* to_do_with_target_ptr)(T*&)) {
+	NodeType* search(int target_key, NodeType* (BST_template::* to_do_with_target_ptr)(NodeType*&)) {
 		if (head == NULL) return (this->*to_do_with_target_ptr)(head);
 		else if (target_key == head->key) return (this->*to_do_with_target_ptr)(head);
 
-		T* search_ptr = head;
+		NodeType* search_ptr = head;
 		while (true) {
 			if (target_key < search_ptr->key) {
 				if (search_ptr->lchild != NULL && search_ptr->lchild->key != target_key)  search_ptr = search_ptr->lchild;
@@ -51,15 +51,15 @@ protected :
 		}
 	}
 
-	T* get_T(T*& parent_seat) {
+	NodeType* get_T(NodeType*& parent_seat) {
 		return parent_seat;
 	}
 
-	T* set_dummy_child(T*& parent_seat) {
-		return parent_seat = new T(0, 0);
+	NodeType* set_dummy_child(NodeType*& parent_seat) {
+		return parent_seat = new NodeType(0, 0);
 	}
 
-	T* remove_target(T*& target_ptr) {
+	NodeType* remove_target(NodeType*& target_ptr) {
 		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 			replace_with_inorder_successor(target_ptr);
 		}
@@ -76,9 +76,9 @@ protected :
 		}
 	}
 
-	void replace_with_inorder_predecessor(T*& target_ptr) {
-		T* previous_ptr = NULL;
-		T* traverse_ptr = target_ptr->lchild;
+	void replace_with_inorder_predecessor(NodeType*& target_ptr) {
+		NodeType* previous_ptr = NULL;
+		NodeType* traverse_ptr = target_ptr->lchild;
 		while (traverse_ptr->rchild != NULL) {
 			previous_ptr = traverse_ptr;
 			traverse_ptr = traverse_ptr->rchild;
@@ -90,9 +90,9 @@ protected :
 		delete traverse_ptr;
 	}
 
-	void replace_with_inorder_successor(T*& target_ptr) {
-		T* previous_ptr = NULL;
-		T* traverse_ptr = target_ptr->rchild;
+	void replace_with_inorder_successor(NodeType*& target_ptr) {
+		NodeType* previous_ptr = NULL;
+		NodeType* traverse_ptr = target_ptr->rchild;
 		while (traverse_ptr->lchild != NULL) {
 			previous_ptr = traverse_ptr;
 			traverse_ptr = traverse_ptr->lchild;
@@ -107,11 +107,11 @@ protected :
 
 	//"to_do_while_traverse" 함수 포인터는 전위순회로 돌면서 각 노드에 수행할 작업을 위한 인터페이스임
 	//"optional_target_BST" BST 포인터는 앞선 "to_do_while_traverse" 작업에서 대상 BST 포인터가 필요한 경우를 위한 인수임.
-	void preorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
+	void preorder_traverse(void (*to_do_while_traverse)(NodeType*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
-		stack<T*> head_stack;
-		T* traverse_ptr = NULL;
+		Stack<NodeType*> head_stack;
+		NodeType* traverse_ptr = NULL;
 		head_stack.push(this->head);
 		while ((traverse_ptr = head_stack.pop())) {
 			(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
@@ -120,17 +120,17 @@ protected :
 		}
 	}
 
-	void inorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
+	void inorder_traverse(void (*to_do_while_traverse)(NodeType*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
-		stack<T*> head_stack;
+		Stack<NodeType*> head_stack;
 		head_stack.push(head);
 		bool new_left_spine = true;
 		while (!head_stack.is_empty()) {
 			while (new_left_spine && head_stack.get_top()->lchild) {
 				head_stack.push(head_stack.get_top()->lchild);
 			}
-			T* traverse_ptr = head_stack.pop();
+			NodeType* traverse_ptr = head_stack.pop();
 			(*to_do_while_traverse)(traverse_ptr, optional_target_BST);
 			if (traverse_ptr->rchild != NULL) {
 				head_stack.push(traverse_ptr->rchild);
@@ -140,10 +140,10 @@ protected :
 		}
 	}
 
-	void postorder_traverse(void (*to_do_while_traverse)(T*, BST_template*), BST_template* optional_target_BST) {
+	void postorder_traverse(void (*to_do_while_traverse)(NodeType*, BST_template*), BST_template* optional_target_BST) {
 		if (head == NULL) return;
 
-		stack<T*> head_stack;
+		Stack<NodeType*> head_stack;
 		head_stack.push(head);
 		bool new_left_spine = true;
 		bool new_right_spine = true;
@@ -158,19 +158,19 @@ protected :
 			else {
 				(*to_do_while_traverse)(head_stack.get_top(), optional_target_BST);
 				new_left_spine = false;
-				T* previous_node = head_stack.pop();
-				T* present_node = head_stack.get_top();
+				NodeType* previous_node = head_stack.pop();
+				NodeType* present_node = head_stack.get_top();
 				if (present_node && present_node->rchild && (present_node->rchild == previous_node)) new_right_spine = false;
 				else new_right_spine = true;
 			}
 		}
 	}
 
-	static void print_node(T* target_node, BST_template* dummy_argument) {
+	static void print_node(NodeType* target_node, BST_template* dummy_argument) {
 		cout << "node key : " << target_node->key << " / node data : " << target_node->data << endl;
 	}
 
-	static void remove_childs(T* target_node, BST_template* dummy_argument) {
+	static void remove_childs(NodeType* target_node, BST_template* dummy_argument) {
 		if (target_node->lchild != NULL) {
 			delete target_node->lchild;
 			target_node->lchild = NULL;
@@ -181,7 +181,7 @@ protected :
 		}
 	}
 
-	static void copy_node(T* source_node, BST_template* dest_BST) {
+	static void copy_node(NodeType* source_node, BST_template* dest_BST) {
 		dest_BST->insert(source_node->key, source_node->data);
 	}
 
@@ -198,7 +198,7 @@ public:
 	}
 
 	void insert(int new_key, int new_data) {
-		T* made_child = search(new_key, &BST_template::set_dummy_child);
+		NodeType* made_child = search(new_key, &BST_template::set_dummy_child);
 		made_child->key = new_key;
 		made_child->data = new_data;
 	}
