@@ -1,5 +1,5 @@
 #include"AVL_tree.h"
-	void AVL_tree::remove_target(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack) {
+	void AVL_tree::remove_target(AVL_node*& target_ptr, Stack<AVL_node*>* ancester_node_stack) {
 		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
 			replace_with_inorder_successor(target_ptr, ancester_node_stack);
 		}
@@ -16,7 +16,7 @@
 		balancing_all_target_to_root(ancester_node_stack);
 	}
 
-	void AVL_tree::replace_with_inorder_predecessor(AVL_node * &target_ptr, stack<AVL_node*>*ancester_node_stack) {
+	void AVL_tree::replace_with_inorder_predecessor(AVL_node * &target_ptr, Stack<AVL_node*>*ancester_node_stack) {
 		AVL_node* previous_ptr = NULL;
 		AVL_node* traverse_ptr = target_ptr->lchild;
 		ancester_node_stack->push(target_ptr);
@@ -32,7 +32,7 @@
 		delete traverse_ptr;
 	}
 
-	void AVL_tree::replace_with_inorder_successor(AVL_node * &target_ptr, stack<AVL_node*>*ancester_node_stack) {
+	void AVL_tree::replace_with_inorder_successor(AVL_node * &target_ptr, Stack<AVL_node*>*ancester_node_stack) {
 		AVL_node* previous_ptr = NULL;
 		AVL_node* traverse_ptr = target_ptr->rchild;
 		ancester_node_stack->push(target_ptr);
@@ -48,7 +48,7 @@
 		delete traverse_ptr;
 	}
 
-	void AVL_tree::balancing_all_target_to_root(stack<AVL_node*>*ancester_node_stack) {
+	void AVL_tree::balancing_all_target_to_root(Stack<AVL_node*>*ancester_node_stack) {
 		while (ancester_node_stack->is_empty() == false) {
 			AVL_node* retraverse_node = ancester_node_stack->pop();
 			AVL_node* parent_of_retraverse_node = ancester_node_stack->get_top();
@@ -177,7 +177,7 @@
 		}
 
 		AVL_node* traverse_ptr = head;
-		stack<AVL_node*> ancester_node_stack;
+		Stack<AVL_node*> ancester_node_stack;
 		while (true) {
 			if (new_key < traverse_ptr->key) {
 				if (traverse_ptr->lchild == NULL) {
@@ -212,7 +212,7 @@
 			return;
 		}
 
-		stack<AVL_node*> ancester_node_stack;
+		Stack<AVL_node*> ancester_node_stack;
 
 		if (head->key == target_key) {
 			remove_target(head, &ancester_node_stack);

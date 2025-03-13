@@ -23,13 +23,13 @@ class AVL_node {
 
 class AVL_tree : public BST_template<AVL_node> {
 protected :
-	void remove_target(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack);
+	void remove_target(AVL_node*& target_ptr, Stack<AVL_node*>* ancester_node_stack);
 
-	void replace_with_inorder_predecessor(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack);
+	void replace_with_inorder_predecessor(AVL_node*& target_ptr, Stack<AVL_node*>* ancester_node_stack);
 
-	void replace_with_inorder_successor(AVL_node*& target_ptr, stack<AVL_node*>* ancester_node_stack);
+	void replace_with_inorder_successor(AVL_node*& target_ptr, Stack<AVL_node*>* ancester_node_stack);
 
-	void balancing_all_target_to_root(stack<AVL_node*>* ancester_node_stack);
+	void balancing_all_target_to_root(Stack<AVL_node*>* ancester_node_stack);
 
 	void balancing_target_node(AVL_node* target_node, AVL_node* parent_node);
 
