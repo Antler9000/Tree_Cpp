@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-class heap {
+class Heap {
 protected:
 	int* data;
 	int item_num;
@@ -48,14 +48,14 @@ protected:
 
 public:
 	//일단 기본 크기는 50으로 시작. 이를 넘도록 push가 일어나면 기존 크기의 2배를 배정해준다.
-	heap() {
+	Heap() {
 		cout << "heap is being made" << endl;
 		data = new int[50];
 		item_num = 0;
 		max_num = 50;
 	}
 
-	~heap() {
+	~Heap() {
 		cout << "heap is being removed" << endl;
 		delete data;
 		data = NULL;
@@ -100,7 +100,7 @@ public:
 	}
 };
 
-class min_heap : public heap {
+class MinHeap : public Heap {
 	bool is_not_ordered(int parent_index, int child_index) {
 		if (data[parent_index] > data[child_index]) return true;
 		else return false;
@@ -112,11 +112,11 @@ class min_heap : public heap {
 	}
 
 public :
-	min_heap() : heap() {}
+	MinHeap() : Heap() {}
 };
 
 
-class max_heap : public heap {
+class MaxHeap : public Heap {
 	bool is_not_ordered(int parent_index, int child_index) {
 		if (data[parent_index] < data[child_index]) return true;
 		else return false;
@@ -128,7 +128,7 @@ class max_heap : public heap {
 	}
 
 public :
-	max_heap() : heap() {}
+	MaxHeap() : Heap() {}
 };
 
 

@@ -1,6 +1,6 @@
 #include "heap.h"
 
-void heap::reorder_by_promoting() {
+void Heap::reorder_by_promoting() {
 	int target_index = item_num - 1;
 	int parent_index = get_parent_index(target_index);
 
@@ -11,7 +11,7 @@ void heap::reorder_by_promoting() {
 	}
 }
 
-void heap::reorder_by_demoting() {
+void Heap::reorder_by_demoting() {
 	int target_index = 0;
 	int left_child_index = get_left_child_index(target_index);
 	int right_child_index = get_right_child_index(target_index);

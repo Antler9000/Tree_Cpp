@@ -1,7 +1,7 @@
 #include "heap.h"
 
 int main() {
-	min_heap test_heap;
+	MinHeap test_heap;
 	test_heap.push(345);
 	test_heap.push(234);
 	test_heap.push(123);
