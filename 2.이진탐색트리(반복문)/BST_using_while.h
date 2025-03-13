@@ -23,8 +23,8 @@ class BST_node {
 };
 
 
-//이진 탐색 트리를 상속받아 더 특수화된 트리(eg. splay_tree 등)를 만들 때 내부 노드 클래스를 변경하기 쉽도록, 사용할 내부 노드 클래스를 템플릿 인자로 정의하였다.
-//따라서, 이진 탐색 트리에서 더 특수화된 트리을 정의하고 싶다면, BST_template에 자신이 정의한 새 노드 클래스를 인자로 준 것을 그것을 상속받으면 된다. (eg. class splay_tree : public BST_template<splay_node> {};)
+//이진 탐색 트리를 상속받아 더 특수화된 트리(eg. SplayTree 등)를 만들 때 내부 노드 클래스를 변경하기 쉽도록, 사용할 내부 노드 클래스를 템플릿 인자로 정의하였다.
+//따라서, 이진 탐색 트리에서 더 특수화된 트리을 정의하고 싶다면, BST_template에 자신이 정의한 새 노드 클래스를 인자로 준 것을 그것을 상속받으면 된다. (eg. class SplayTree : public BST_template<SplayNode> {};)
 //또한 우리가 일반적으로 사용할 이진 탐색 트리도 이 템플릿에 BST_node를 인자로 준 특수화된 경우로 class BST를 이 다음 클래스로 정의해놓았으니 그것을 사용하면 된다.
 template <class NodeType = BST_node>
 class BST_template {

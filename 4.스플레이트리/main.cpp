@@ -1,7 +1,7 @@
 #include "splay_tree.h"
 
 int main() {
-	splay_tree& test_tree = *(new splay_tree());
+	SplayTree& test_tree = *(new SplayTree());
 	test_tree.insert(5, 1515);
 	test_tree.insert(7, 2727);
 	test_tree.insert(3, 1313);
@@ -36,7 +36,7 @@ int main() {
 	test_tree.preorder_print();
 
 
-	splay_tree& copied_test_tree = *(new splay_tree());
+	SplayTree& copied_test_tree = *(new SplayTree());
 	copied_test_tree.copy_from(&test_tree);
 	copied_test_tree.preorder_print();
 

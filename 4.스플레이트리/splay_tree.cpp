@@ -1,10 +1,10 @@
 #include"splay_tree.h"
 
-int splay_tree::retrieve(int target_key) {
-	splay_node* traverse_ptr = head;
-	splay_node* father_of_traverse_ptr = NULL;
-	splay_node* grandfather_of_traverse_ptr = NULL;
-	splay_node* greatgrandfather_of_traverse_ptr = NULL;
+int SplayTree::retrieve(int target_key) {
+	SplayNode* traverse_ptr = head;
+	SplayNode* father_of_traverse_ptr = NULL;
+	SplayNode* grandfather_of_traverse_ptr = NULL;
+	SplayNode* greatgrandfather_of_traverse_ptr = NULL;
 	while (traverse_ptr != NULL) {
 		if (target_key < traverse_ptr->key) {
 			greatgrandfather_of_traverse_ptr = grandfather_of_traverse_ptr;
@@ -25,7 +25,7 @@ int splay_tree::retrieve(int target_key) {
 	}
 }
 
-void splay_tree::splay_target(splay_node* greatgrandfather_of_traverse_ptr, splay_node* grandfather_of_target, splay_node* father_of_target, splay_node* target) {
+void SplayTree::splay_target(SplayNode* greatgrandfather_of_traverse_ptr, SplayNode* grandfather_of_target, SplayNode* father_of_target, SplayNode* target) {
 	if (greatgrandfather_of_traverse_ptr != NULL) {
 		if (greatgrandfather_of_traverse_ptr->lchild == grandfather_of_target) {
 			if (grandfather_of_target->lchild == father_of_target) {
