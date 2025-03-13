@@ -3,52 +3,85 @@
 
 #include "../2.이진탐색트리(반복문)/BST_using_while.h"
 
+enum NodeColor { RED, BLACK };
 
-class red_black_node {
-	enum node_color { red, black };
+class RedBlackNode {
 
-	friend class BST_template<red_black_node>;
-	friend class red_black_tree;
+	friend class BST_template<RedBlackNode>;
+	friend class RedBlackTree;
 	int key;
 	int data;
-	node_color color;
-	red_black_node* lchild;
-	red_black_node* rchild;
+	NodeColor color;
+	RedBlackNode* lchild;
+	RedBlackNode* rchild;
 
-	red_black_node(int key, int data) {
+	RedBlackNode(int key, int data) {
 		this->key = key;
 		this->data = data;
-		this->color = black;
+		this->color = BLACK;
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
 };
 
-class red_black_tree : public BST_template<red_black_node> {
+class RedBlackTree : public BST_template<RedBlackNode> {
 protected :
 	/*
-	void remove_target(red_black_node*& target_ptr, stack<red_black_node*>* ancester_node_stack);
+	void remove_target(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
 
-	void replace_with_inorder_predecessor(red_black_node*& target_ptr, stack<red_black_node*>* ancester_node_stack);
+	void replace_with_inorder_predecessor(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
 
-	void replace_with_inorder_successor(red_black_node*& target_ptr, stack<red_black_node*>* ancester_node_stack);
+	void replace_with_inorder_successor(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
 	*/
 
-	void LL_rotation(red_black_node* target_node, red_black_node* parent_node);
+	void LL_rotation(RedBlackNode* target_node, RedBlackNode* parent_node);
 
-	void LR_rotation(red_black_node* target_node, red_black_node* parent_node);
+	void LR_rotation(RedBlackNode* target_node, RedBlackNode* parent_node);
 
-	void RL_rotation(red_black_node* target_node, red_black_node* parent_node);
+	void RL_rotation(RedBlackNode* target_node, RedBlackNode* parent_node);
 
-	void RR_rotation(red_black_node* target_node, red_black_node* parent_node);
+	void RR_rotation(RedBlackNode* target_node, RedBlackNode* parent_node);
 
 public :
-	red_black_tree() : BST_template() {}
+	RedBlackTree() : BST_template() {}
+
+	void insert(int new_key, int new_data) {
+		if (head == NULL) {
+			head = new RedBlackNode(new_key, new_data);
+			return;
+		}
+		
+		RedBlackNode* traverse_ptr = head;
+		while (true) {
+			if (new_key < traverse_ptr->key) {
+				if (traverse_ptr->lchild != NULL) {
+					traverse_ptr = traverse_ptr->lchild;
+				}
+				else {
+					traverse_ptr->lchild = new RedBlackNode(new_key, new_data);
+					return;
+				}
+			}
+			else if(traverse_ptr->key < new_key) {
+				if (traverse_ptr->rchild != NULL) {
+					traverse_ptr = traverse_ptr->rchild;
+				}
+				else {
+					traverse_ptr->rchild = new RedBlackNode(new_key, new_data);
+					return;
+				}
+			}
+			else {
+				cout << "Cannot insert node to tree! There are same key node already!" << endl;
+				return;
+			}
+		}
+	}
 
 	/*
-	void insert(int new_key, int new_data);
+	void remove(int target_key) {
 
-	void remove(int target_key);
+	}
 	*/
 };
 

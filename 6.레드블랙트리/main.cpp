@@ -1,7 +1,7 @@
 #include "red_black_tree.h"
 
 int main() {
-	red_black_tree& test_tree = *(new red_black_tree());
+	RedBlackTree& test_tree = *(new RedBlackTree());
 	test_tree.insert(5, 55);
 	test_tree.insert(9, 99);
 	test_tree.insert(8, 88);
@@ -11,7 +11,7 @@ int main() {
 	test_tree.insert(3, 33);
 	test_tree.preorder_print();
 
-	red_black_tree& copied_test_tree = *(new red_black_tree());
+	RedBlackTree& copied_test_tree = *(new RedBlackTree());
 	copied_test_tree.copy_from(&test_tree);
 	copied_test_tree.preorder_print();
 
