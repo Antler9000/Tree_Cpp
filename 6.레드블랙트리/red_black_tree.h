@@ -6,7 +6,6 @@
 enum NodeColor { RED, BLACK };
 
 class RedBlackNode {
-
 	friend class BST_template<RedBlackNode>;
 	friend class RedBlackTree;
 	int key;
@@ -33,6 +32,29 @@ protected :
 
 	void replace_with_inorder_successor(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
 	*/
+	
+	bool is_4_node(RedBlackNode* target_node) {
+		if (target_node->lchild != NULL && target_node->rchild != NULL) {
+			if (target_node->lchild->color == RED && target_node->rchild->color == RED) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void split_4_node(RedBlackNode* target_node) {
+		if (target_node != head) target_node->color = RED;
+		target_node->lchild->color = BLACK;
+		target_node->rchild->color = BLACK;
+	}
+
+	void check_and_deal_with_4_nodes(RedBlackNode* target_node, RedBlackNode* parent_node) {
+		if (is_4_node(target_node)) split_4_node(target_node);
+
+		if (parent_node != NULL && parent_node->color == RED) {
+			//TODO : ROTATION AND RECOLORING IS NEEDED!
+		}
+	}
 
 	void LL_rotation(RedBlackNode* target_node, RedBlackNode* parent_node);
 
@@ -51,8 +73,11 @@ public :
 			return;
 		}
 		
+
 		RedBlackNode* traverse_ptr = head;
+		RedBlackNode* past_traverse_ptr = NULL;
 		while (true) {
+
 			if (new_key < traverse_ptr->key) {
 				if (traverse_ptr->lchild != NULL) {
 					traverse_ptr = traverse_ptr->lchild;
