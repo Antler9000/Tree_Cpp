@@ -20,6 +20,10 @@ class BST_node {
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
+
+	inline void print_node() {
+		cout << "node key : " << key << " / node data : " << data << endl;
+	}
 };
 
 
@@ -28,7 +32,7 @@ class BST_node {
 //또한 우리가 일반적으로 사용할 이진 탐색 트리도 이 템플릿에 BST_node를 인자로 준 특수화된 경우로 class BST를 이 다음 클래스로 정의해놓았으니 그것을 사용하면 된다.
 template <class NodeType = BST_node>
 class BST_template {
-protected :
+protected:
 	NodeType* head;
 
 	//"to_do_with_target_ptr" 메소드 포인터는 특정 target_key를 가진 노드를 가리키는 자식 포인터에 수행할 작업이나,
@@ -166,8 +170,8 @@ protected :
 		}
 	}
 
-	static void print_node(NodeType* target_node, BST_template* dummy_argument) {
-		cout << "node key : " << target_node->key << " / node data : " << target_node->data << endl;
+	static void print_target_node(NodeType* target_node, BST_template* dummy_argument) {
+		target_node->print_node();
 	}
 
 	static void remove_childs(NodeType* target_node, BST_template* dummy_argument) {
@@ -224,19 +228,19 @@ public:
 
 	void preorder_print() {
 		cout << "preorder traverse start" << endl;
-		preorder_traverse(&BST_template::print_node, NULL);
+		preorder_traverse(&BST_template::print_target_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
 
 	void inorder_print() {
 		cout << "inorder traverse start" << endl;
-		inorder_traverse(&BST_template::print_node, NULL);
+		inorder_traverse(&BST_template::print_target_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
 
 	void postorder_print() {
 		cout << "postorder traverse start" << endl;
-		postorder_traverse(&BST_template::print_node, NULL);
+		postorder_traverse(&BST_template::print_target_node, NULL);
 		cout << "traverse ended" << endl << endl;
 	}
 };
