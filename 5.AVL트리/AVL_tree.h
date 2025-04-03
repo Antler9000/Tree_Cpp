@@ -19,6 +19,10 @@ class AVL_node {
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
+
+	inline void print_node() {
+		cout << "node key : " << key << " / node data : " << data << endl;
+	}
 };
 
 class AVL_tree : public BST_template<AVL_node> {

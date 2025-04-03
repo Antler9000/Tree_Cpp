@@ -17,6 +17,10 @@ class SplayNode {
 		this->lchild = NULL;
 		this->rchild = NULL;
 	}
+
+	inline void print_node() {
+		cout << "node key : " << key << " / node data : " << data << endl;
+	}
 };
 
 class SplayTree : public BST_template<SplayNode> {
