@@ -1,7 +1,7 @@
 #include "BST_using_recurse.h"
 
 int main() {
-	BST& test_BST = *(new BST());
+	BST test_BST;
 	test_BST.insert(5, 1515);
 	test_BST.insert(7, 2727);
 	test_BST.insert(3, 1313);
@@ -9,7 +9,7 @@ int main() {
 	test_BST.insert(6, 3636);
 	test_BST.preorder_print();
 
-	BST& copied_BST = *(new BST());
+	BST copied_BST;
 	copied_BST.copy_from(&test_BST);
 	copied_BST.preorder_print();
 
