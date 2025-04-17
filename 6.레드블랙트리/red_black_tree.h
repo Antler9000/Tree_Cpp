@@ -41,14 +41,6 @@ class RedBlackNode {
 
 class RedBlackTree : public BST_template<RedBlackNode> {
 protected :
-	/*
-	void remove_target(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
-
-	void replace_with_inorder_predecessor(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
-
-	void replace_with_inorder_successor(RedBlackNode*& target_ptr, stack<RedBlackNode*>* ancester_node_stack);
-	*/
-
 	void check_and_resolve_4_nodes_while_descent(Stack<RedBlackNode*>* route_stack) {
 		RedBlackNode* target_node = route_stack->pop();
 		RedBlackNode* parent_node = route_stack->pop();
@@ -161,6 +153,50 @@ protected :
 		grand_parent_node = parent_node;
 	}
 
+	void remove_target(RedBlackNode*& target_ptr, Stack<RedBlackNode*>* route_stack) {
+		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+			replace_with_inorder_successor(target_ptr, route_stack);
+		}
+		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
+			replace_with_inorder_successor(target_ptr, route_stack);
+		}
+		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
+			replace_with_inorder_predecessor(target_ptr, route_stack);
+		}
+		else {
+			delete target_ptr;
+			target_ptr = NULL;
+		}
+	}
+
+	void replace_with_inorder_predecessor(RedBlackNode*& target_ptr, Stack<RedBlackNode*>* route_stack) {
+		RedBlackNode* previous_ptr = NULL;
+		RedBlackNode* traverse_ptr = target_ptr->lchild;
+		while (traverse_ptr->rchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->rchild;
+		}
+		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;
+		else target_ptr->lchild = traverse_ptr->lchild;
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
+	}
+
+	void replace_with_inorder_successor(RedBlackNode*& target_ptr, Stack<RedBlackNode*>* route_stack) {
+		RedBlackNode* previous_ptr = NULL;
+		RedBlackNode* traverse_ptr = target_ptr->rchild;
+		while (traverse_ptr->lchild != NULL) {
+			previous_ptr = traverse_ptr;
+			traverse_ptr = traverse_ptr->lchild;
+		}
+		if (previous_ptr != NULL) previous_ptr->lchild = traverse_ptr->rchild;
+		else target_ptr->rchild = traverse_ptr->rchild;
+		target_ptr->key = traverse_ptr->key;
+		target_ptr->data = traverse_ptr->data;
+		delete traverse_ptr;
+	}
+
 public :
 	RedBlackTree() : BST_template() {}
 
@@ -169,7 +205,7 @@ public :
 			head = new RedBlackNode(new_key, new_data);
 			return;
 		}
-		
+
 		RedBlackNode* traverse_ptr = head;
 		Stack<RedBlackNode*> route_stack;
 		while (true) {
@@ -188,7 +224,7 @@ public :
 					return;
 				}
 			}
-			else if(traverse_ptr->key < new_key) {
+			else if (traverse_ptr->key < new_key) {
 				if (traverse_ptr->rchild != NULL) {
 					traverse_ptr = traverse_ptr->rchild;
 				}
@@ -207,11 +243,50 @@ public :
 		}
 	}
 
-	/*
 	void remove(int target_key) {
+		Stack<RedBlackNode*> route_stack;
 
+		if (head->key == target_key) {
+			route_stack.push(head);
+			remove_target(head, &route_stack);
+			return;
+		} 
+
+		RedBlackNode* traverse_ptr = head;
+		while (true) {
+			if (target_key < traverse_ptr->key) {
+				if (traverse_ptr->lchild != NULL) {
+					route_stack.push(traverse_ptr);
+					traverse_ptr = traverse_ptr->lchild;
+				}
+				else {
+					cout << "Cannot remove! Cannot find such target node!" << endl;
+					return;
+				}
+			}
+			else if (traverse_ptr->key < target_key) {
+				if (traverse_ptr->rchild != NULL) {
+					route_stack.push(traverse_ptr);
+					traverse_ptr = traverse_ptr->rchild;
+				}
+				else {
+					cout << "Cannot remove! Cannot find such target node!" << endl;
+					return;
+				}
+			}
+			else {
+				RedBlackNode* parent = route_stack.get_top();
+				route_stack.push(traverse_ptr);
+				if (parent->lchild = traverse_ptr) {
+					remove_target(parent->lchild, &route_stack);
+				}
+				else {
+					remove_target(parent->rchild, &route_stack);
+				}
+				return;
+			}
+		}
 	}
-	*/
 };
 
 #endif //RED_BLACK_TREE_H
