@@ -18,7 +18,7 @@
     <ClCompile Include="AVL_tree.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="main_AVL_tree.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

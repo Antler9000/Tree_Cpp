@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AVL_tree.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_AVL_tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AVL_tree.h" />

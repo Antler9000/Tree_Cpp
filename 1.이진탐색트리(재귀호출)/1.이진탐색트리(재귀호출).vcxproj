@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BST_using_recurse.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_BST_using_recurse.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BST_using_recurse.h" />

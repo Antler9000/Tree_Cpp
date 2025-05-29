@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="heap.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_heap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="heap.h" />

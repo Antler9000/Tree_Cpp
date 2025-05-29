@@ -54,7 +54,7 @@ protected :
 				RedBlackNode* grand_parent_node = route_stack->pop();
 				RedBlackNode* great_grand_parent_node = route_stack->pop();
 
-				resolve_consecutive_red_nodes(target_node, parent_node, grand_parent_node, great_grand_parent_node);
+				do_proper_rotation(target_node, parent_node, grand_parent_node, great_grand_parent_node);
 
 				if (great_grand_parent_node != NULL) route_stack->push(great_grand_parent_node);
 				route_stack->push(grand_parent_node);
@@ -64,20 +64,6 @@ protected :
 
 		route_stack->push(parent_node);
 		route_stack->push(target_node);
-	}
-
-	//삽입 메소드에서는 빈 리프노드에 레드 노드의 형태로 삽입이 일어난다.
-	//그렇게 삽입이 일어났는데 "조부노드-부모노드-삽입노드"가 "블랙-레드-레드"이렇게 연속적인 레드로 구성될 경우,
-	//이를 확인하고 회전으로 해결하기 위한 메소드다.
-	void check_and_resolve_4_nodes_on_destination(Stack<RedBlackNode*>* route_stack) {
-		RedBlackNode* target_node = route_stack->pop();
-		RedBlackNode* parent_node = route_stack->pop();
-
-		if (parent_node->color == RED) {
-			RedBlackNode* grand_parent_node = route_stack->pop();
-			RedBlackNode* great_grand_parent_node = route_stack->pop();
-			resolve_consecutive_red_nodes(target_node, parent_node, grand_parent_node, great_grand_parent_node);
-		}
 	}
 
 	bool is_4_node(RedBlackNode* target_node) {
@@ -93,7 +79,21 @@ protected :
 		if (target_node != head) target_node->color = RED;
 	}
 
-	void resolve_consecutive_red_nodes(RedBlackNode* target_node, RedBlackNode* parent_node, RedBlackNode* grand_parent_node, RedBlackNode* great_grand_parent_node) {
+	//삽입 메소드에서는 빈 리프노드에 레드 노드의 형태로 삽입이 일어난다.
+	//그렇게 삽입이 일어났는데 "조부노드-부모노드-삽입노드"가 "블랙-레드-레드"이렇게 연속적인 레드로 구성될 경우,
+	//이를 확인하고 회전으로 해결하기 위한 메소드다.
+	void check_and_resolve_4_nodes_on_destination(Stack<RedBlackNode*>* route_stack) {
+		RedBlackNode* target_node = route_stack->pop();
+		RedBlackNode* parent_node = route_stack->pop();
+
+		if (parent_node->color == RED) {
+			RedBlackNode* grand_parent_node = route_stack->pop();
+			RedBlackNode* great_grand_parent_node = route_stack->pop();
+			do_proper_rotation(target_node, parent_node, grand_parent_node, great_grand_parent_node);
+		}
+	}
+
+	void do_proper_rotation(RedBlackNode* target_node, RedBlackNode* parent_node, RedBlackNode* grand_parent_node, RedBlackNode* great_grand_parent_node) {
 		if (great_grand_parent_node == NULL) {
 			select_proper_rotation(target_node, parent_node, head);
 		}
@@ -166,46 +166,77 @@ protected :
 
 	//삭제 대상이 리프 노드여서 아에 삭제되는 경우,
 	//그 노드를 가리키는 부모노드의 자식 포인터를 null로 해야하기에 레퍼런스 인자를 두었다.
-	void remove_target(RedBlackNode*& target_ptr, Stack<RedBlackNode*>* route_stack) {
-		if (target_ptr->lchild != NULL && target_ptr->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
-			replace_with_inorder_successor(target_ptr, route_stack);
+	void remove_target(RedBlackNode*& target_node, Stack<RedBlackNode*>* route_stack) {
+		if (target_node->lchild != NULL && target_node->rchild != NULL) {				//두 자식 모두 있는 경우엔, 중위선행자와 중위후속자 중에서 그냥 중위후속자(오른쪽 자식 트리에서 제일 작은 키 값의 노드)를 없애기로함
+			replace_with_inorder_successor(target_node, route_stack);
 		}
-		else if (target_ptr->lchild == NULL && target_ptr->rchild != NULL) {
-			replace_with_inorder_successor(target_ptr, route_stack);
+		else if (target_node->lchild == NULL && target_node->rchild != NULL) {
+			replace_with_inorder_successor(target_node, route_stack);
 		}
-		else if (target_ptr->lchild != NULL && target_ptr->rchild == NULL) {
-			replace_with_inorder_predecessor(target_ptr, route_stack);
+		else if (target_node->lchild != NULL && target_node->rchild == NULL) {
+			replace_with_inorder_predecessor(target_node, route_stack);
 		}
 		else {
-			delete target_ptr;
-			target_ptr = NULL;
+			delete target_node;
+			target_node = NULL;
 		}
 	}
 
 	//이진탐색트리에서의 replace_with_inorder_predecessor(...)과 차이점은,
 	//중위 선행자나 후속자의 삭제 문제로 대체할 때, 트리의 블랙 노드의 균형이 깨지는 것을 방지하기 위해서 다음을 수행한다는 점이다.
-	//1.중위 선행자나 후속자 자신이 레드 노드인가?
-	// -> 그렇다면 그냥 삭제하면 된다
-	//2.위 경우가 아니라면, 대체될 중위 선행자나 후속자에게 자식으로 레드 리프 노드가 달려있는가?
-	// -> 그렇다면 중위 선행자나 후속자의 부모에 해당 자식을 붙일 때, 해당 빨간 자식 노드의 색깔을 검은색으로 바꾸면 된다
-	//3.위 경우도 아니라면, 균형을 맞추기 위해 댕겨올 자매노드의 자식(=조카) 레드노드가 있는가?
-	// -> 그렇다면 회전을 통해서 블랙 노드의 균형을 맞추면 된다. 색깔은 회전 이전에 원래 그 자리에 위치해있던 노드의 색깔을 물려받도록 한다
-	//4.위 경우도 아니라면, 부모노드가 레드노드인가?
-	// -> 부모노드가 블랙노드가 되고 자매 노드가 레드 노드가 되도록 변경하여 균형을 맞추자
-	//5.위 경우도 아니라면
-	// -> 자매 노드를 레드 노드가 되도록 하고서, 부모노드 위치의 삭제 문제로 변환하여 다시 3번부터 수행하도록 하자
-	void replace_with_inorder_predecessor(RedBlackNode*& target_ptr, Stack<RedBlackNode*>* route_stack) {
-		RedBlackNode* previous_ptr = NULL;
-		RedBlackNode* traverse_ptr = target_ptr->lchild;
+	void replace_with_inorder_predecessor(RedBlackNode*& target_node, Stack<RedBlackNode*>* route_stack) {
+		RedBlackNode* traverse_ptr = target_node->lchild;
+		route_stack->push(traverse_ptr);
 		while (traverse_ptr->rchild != NULL) {
-			previous_ptr = traverse_ptr;
 			traverse_ptr = traverse_ptr->rchild;
+			route_stack->push(traverse_ptr);
 		}
-		if (previous_ptr != NULL) previous_ptr->rchild = traverse_ptr->lchild;
-		else target_ptr->lchild = traverse_ptr->lchild;
-		target_ptr->key = traverse_ptr->key;
-		target_ptr->data = traverse_ptr->data;
-		delete traverse_ptr;
+		RedBlackNode* predecessor_node = route_stack->pop();
+		RedBlackNode* parent_of_predecessor = route_stack->pop();
+		RedBlackNode* grand_parent_of_predecessor = route_stack->pop();
+		target_node->key = predecessor_node->key;
+		target_node->data = predecessor_node->data;
+
+		//1.중위 선행자나 후속자 자신이 레드 노드인가?
+		// -> 그렇다면 그냥 삭제하면 된다
+		if (predecessor_node->color == RED) {
+			if (parent_of_predecessor == NULL) parent_of_predecessor->lchild = NULL;
+			else parent_of_predecessor->rchild = NULL;
+			delete predecessor_node;
+			return;
+		}
+		//2.위 경우가 아니라면, 중위 선행자나 후속자에게 자식으로 레드 리프 노드가 달려있는가?
+		// -> 그렇다면 중위 선행자나 후속자의 부모에 해당 자식을 붙일 때, 해당 빨간 자식 노드의 색깔을 검은색으로 바꾸면 된다
+		if ((predecessor_node->lchild != NULL) && (predecessor_node->lchild->color == RED)) {
+			predecessor_node->key = predecessor_node->lchild->key;
+			predecessor_node->data = predecessor_node->lchild->data;
+			delete predecessor_node->lchild;
+			predecessor_node->lchild == NULL;
+			return;
+		}
+		//3.위 경우도 아니라면, 균형을 맞추기 위해 댕겨올 자매노드의 자식(=조카) 레드노드가 있는가?
+		// -> 그렇다면 회전을 통해서 블랙 노드의 균형을 맞추면 된다. 색깔은 회전 이전에 원래 그 자리에 위치해있던 노드의 색깔을 물려받도록 한다
+		RedBlackNode* brother_ptr = NULL;
+		if (parent_of_predecessor == NULL) brother_ptr = parent_of_predecessor->rchild;
+		else brother_ptr = parent_of_predecessor->lchild;
+		
+		if ((brother_ptr->lchild) && (brother_ptr->lchild->color == RED)) {
+			do_proper_rotation(brother_ptr->lchild, brother_ptr, parent_of_predecessor, grand_parent_of_predecessor);
+			return;
+		}
+		else if ((brother_ptr->rchild) && (brother_ptr->rchild->color == RED)) {
+			do_proper_rotation(brother_ptr->rchild, brother_ptr, parent_of_predecessor, grand_parent_of_predecessor);
+			return;
+		}
+		
+		//4.위 경우도 아니라면, 부모노드가 레드노드인가?
+		// -> 부모노드가 블랙노드가 되고 자매 노드가 레드 노드가 되도록 변경하여 균형을 맞추자
+
+
+		//5.위 경우도 아니라면
+		// -> 자매 노드를 레드 노드가 되도록 하고서, 부모노드 위치의 삭제 문제로 변환하여 다시 3번부터 수행하도록 하자
+
+
 	}
 
 	//이진탐색트리에서의 replace_with_inorder_successor()과 차이점은 바로 위의 replace_with_inorder_predecessor(...)메소드에 기재되어 있는 것과 같다.
